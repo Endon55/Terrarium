@@ -3,6 +3,7 @@ package com.terrarium;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.physics.box2d.World;
+import com.terrarium.assets.AssetLoader;
 
 public class Ground
 {
@@ -12,7 +13,7 @@ public class Ground
     public Ground(World world)
     {
         this.world = world;
-        tiledMap = new TmxMapLoader().load("core/assets/Ground/HollowSky.tmx");
+        tiledMap = AssetLoader.tmxLoader("core/assets/Ground/HollowSky.tmx");
     }
 
     public TiledMap getMap()
