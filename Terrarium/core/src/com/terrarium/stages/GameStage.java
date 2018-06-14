@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -17,7 +17,7 @@ import com.terrarium.Player;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.WorldUtils;
 
-public class GameStage extends Stage
+public class GameStage extends Stage implements ContactListener
 {
 
     World world;
@@ -25,6 +25,7 @@ public class GameStage extends Stage
     private Player player;
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer renderer;
+    private Box2DDebugRenderer debugRenderer;
     private TiledMap map;
     SpriteBatch batch;
     Animation<TextureRegion> walkAnimation;
@@ -33,11 +34,12 @@ public class GameStage extends Stage
     {
         world = WorldUtils.createWorld();
         ground = new Ground(world);
-        player = new Player();
+        player = new Player(world);
         walkAnimation = player.getWalkAnimation();
         map = ground.getMap();
         batch = new SpriteBatch();
         renderer = new OrthogonalTiledMapRenderer(map);
+        debugRenderer = new Box2DDebugRenderer();
         camera = new OrthographicCamera();
 
         camera.setToOrtho(false, Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
@@ -56,11 +58,40 @@ public class GameStage extends Stage
         camera.update();
 
         //Player animation
-        player.draw(batch, Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2);
+        player.draw(batch, world, Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2);
 
         renderer.setView(camera);
         batch.end();
         renderer.render();
+        debugRenderer.render(world, camera.combined);
     }
 
+    @Override
+    public void beginContact(Contact contact)
+    {
+        Body a = contact.getFixtureA().getBody();
+        Body b = contact.getFixtureB().getBody();
+        if(a == player.getBody() || b == player.getBody())
+        {
+            player.landed();
+        }
+    }
+
+    @Override
+    public void endContact(Contact contact)
+    {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold)
+    {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse)
+    {
+
+    }
 }

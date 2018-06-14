@@ -3,12 +3,13 @@ package com.terrarium;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.terrarium.assets.AssetLoader;
+import com.terrarium.utils.Constants;
 
-public class Player extends Actor
+public class Player
 {
 
     private static final int FRAME_COLS = 9;
@@ -19,12 +20,13 @@ public class Player extends Actor
     TextureRegion[] walkFrames;
     Texture playerTexture;
     Sprite sprite;
-    float stateTime;
-
     Body body;
     BodyDef bodyDef;
+    float stateTime;
 
-    public Player()
+    private boolean landed;
+
+    public Player(World world)
     {
 
         stateTime = 0f;
@@ -44,6 +46,34 @@ public class Player extends Actor
 
         walkAnimation = new Animation<TextureRegion>(.025f, walkFrames);
 
+
+
+        //box
+        bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(new Vector2(Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2));
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(Constants.RUNNER_WIDTH / 2, Constants.RUNNER_HEIGHT / 2);
+
+
+
+        body = world.createBody(bodyDef);
+        body.setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
+        body.createFixture(shape, Constants.RUNNER_DENSITY);
+        body.resetMassData();
+        //body.setUserData(new RunnerUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
+        shape.dispose();
+
+    }
+
+    public Body getBody()
+    {
+        return body;
+    }
+
+    public void landed()
+    {
+        landed = true;
     }
 
     public Sprite getSprite()
@@ -56,10 +86,12 @@ public class Player extends Actor
         return walkAnimation;
     }
 
-    public void draw(Batch batch, int x, int y)
+    public void draw(Batch batch, World world, int x, int y)
     {
         stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
         batch.draw(currentFrame, x, y);
     }
+
+
 }

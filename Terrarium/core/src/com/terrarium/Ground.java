@@ -13,7 +13,7 @@ public class Ground
     public Ground(World world)
     {
         this.world = world;
-        tiledMap = AssetLoader.tmxLoader("core/assets/Ground/HollowSky.tmx");
+        tiledMap = AssetLoader.tmxLoader("core/assets/Ground/smallMap.tmx");
     }
 
     public TiledMap getMap()
