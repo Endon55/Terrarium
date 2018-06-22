@@ -3,14 +3,81 @@ package com.terrarium;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.utils.Constants;
+import com.terrarium.utils.DrawingUtils;
+
 
 public class Player
 {
+
+    Body playerBody;
+    BodyDef playerBodyDef;
+    Texture goldTexture;
+    Fixture playerFixture;
+
+    public Player(World world)
+    {
+
+        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
+        //TextureRegion goldRegion = new TextureRegion(goldTexture);
+
+        playerBodyDef = new BodyDef();
+        playerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        playerBodyDef.position.set(15, 14);
+        playerBody = world.createBody(playerBodyDef);
+        createFixture();
+
+    }
+
+    private void createFixture()
+    {
+        PolygonShape playerBox = new PolygonShape();
+        playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.RUNNER_WIDTH, false), DrawingUtils.pixelsToMeters(Constants.RUNNER_HEIGHT, true));
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = playerBox;
+        fixtureDef.density = 0.9f;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.0f;
+        playerFixture = playerBody.createFixture(fixtureDef);
+        playerBox.dispose();
+
+    }
+
+    public void draw(SpriteBatch batch)
+    {
+        batch.draw(goldTexture, DrawingUtils.metersToPixels(playerBody.getPosition().x, false),  DrawingUtils.metersToPixels(playerBody.getPosition().y, true));
+    }
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+public class Player
+{
+
+    private boolean landed;
 
     private static final int FRAME_COLS = 9;
     private static final int FRAME_ROWS = 4;
@@ -19,15 +86,16 @@ public class Player
     TextureRegion[][] textureRegion;
     TextureRegion[] walkFrames;
     Texture playerTexture;
+    Vector2 location = new Vector2(Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2);
     Sprite sprite;
     Body body;
     BodyDef bodyDef;
     float stateTime;
 
-    private boolean landed;
 
     public Player(World world)
     {
+
 
         stateTime = 0f;
         playerTexture = AssetLoader.textureLoader("core/assets/goldArmor.png");
@@ -49,20 +117,22 @@ public class Player
 
 
         //box
+
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(new Vector2(Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2));
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(Constants.RUNNER_WIDTH / 2, Constants.RUNNER_HEIGHT / 2);
-
-
+        bodyDef.position.set(0, 60);
 
         body = world.createBody(bodyDef);
-        body.setGravityScale(Constants.RUNNER_GRAVITY_SCALE);
-        body.createFixture(shape, Constants.RUNNER_DENSITY);
-        body.resetMassData();
-        //body.setUserData(new RunnerUserData(Constants.RUNNER_WIDTH, Constants.RUNNER_HEIGHT));
-        shape.dispose();
+        PolygonShape box = new PolygonShape();
+        box.setAsBox(1, 2);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = box;
+        fixtureDef.density = 0.5f;
+        fixtureDef.friction = 0.4f;
+        fixtureDef.restitution = 0.6f;
+        Fixture fixture = body.createFixture(fixtureDef);
+
+        box.dispose();
 
     }
 
@@ -80,18 +150,37 @@ public class Player
     {
         return sprite;
     }
+    public Vector2 getLocation()
+    {
+        return location;
+    }
 
+    public void setLocation(Vector2 location)
+    {
+        this.location = location;
+    }
     public Animation<TextureRegion> getWalkAnimation()
     {
         return walkAnimation;
     }
 
-    public void draw(Batch batch, World world, int x, int y)
+
+
+
+    public void draw(Batch batch, World world)
     {
+        Vector2 bodyVec = body.getPosition();
+        location.x = (bodyVec.x - Constants.RUNNER_WIDTH);
+        location.y = (bodyVec.y - Constants.RUNNER_HEIGHT);
+
+        //System.out.println("x: " + location.x + "y: " + location.y );
+        //System.out.println("x: " + bodyVec.x + "y: " + bodyVec.y );
         stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, x, y);
+        batch.draw(currentFrame, location.x, location.y);
+
     }
 
 
 }
+*/
