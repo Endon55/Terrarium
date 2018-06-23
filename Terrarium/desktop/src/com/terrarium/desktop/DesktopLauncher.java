@@ -1,5 +1,6 @@
 package com.terrarium.desktop;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.terrarium.Terrarium;
@@ -27,6 +28,7 @@ import com.terrarium.utils.Constants;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.addIcon("core/assets/goldStill.png", Files.FileType.Internal);
 		config.title = "Terrarium";
 		config.width = Constants.APP_WIDTH;
 		config.height = Constants.APP_HEIGHT;

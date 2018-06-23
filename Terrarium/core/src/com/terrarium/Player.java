@@ -12,7 +12,6 @@ import com.terrarium.utils.DrawingUtils;
 
 public class Player
 {
-
     Body playerBody;
     BodyDef playerBodyDef;
     Texture goldTexture;
@@ -20,35 +19,35 @@ public class Player
 
     public Player(World world)
     {
-
         goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
-        //TextureRegion goldRegion = new TextureRegion(goldTexture);
-
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
         playerBodyDef.position.set(15, 14);
         playerBody = world.createBody(playerBodyDef);
         createFixture();
-
     }
 
     private void createFixture()
     {
         PolygonShape playerBox = new PolygonShape();
-        playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.RUNNER_WIDTH, false), DrawingUtils.pixelsToMeters(Constants.RUNNER_HEIGHT, true));
+        playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = playerBox;
         fixtureDef.density = 0.9f;
         fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.0f;
+        fixtureDef.restitution = 0.5f;
         playerFixture = playerBody.createFixture(fixtureDef);
         playerBox.dispose();
-
     }
 
     public void draw(SpriteBatch batch)
     {
-        batch.draw(goldTexture, DrawingUtils.metersToPixels(playerBody.getPosition().x, false),  DrawingUtils.metersToPixels(playerBody.getPosition().y, true));
+        System.out.println("Body: " + playerBody.getPosition() +  " Pixels: " + DrawingUtils.metersToPixels(playerBody.getPosition().x, false));
+        batch.draw(goldTexture,
+                //Width
+                DrawingUtils.metersToPixels(playerBody.getPosition().x, false) - Constants.PLAYER_WIDTH / 2,
+                //Height
+                DrawingUtils.metersToPixels(playerBody.getPosition().y, true) - Constants.PLAYER_HEIGHT / 2);
     }
 
 
