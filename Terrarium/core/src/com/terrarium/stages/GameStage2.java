@@ -1,4 +1,4 @@
-/*
+
 package com.terrarium.stages;
 
 import com.badlogic.gdx.Gdx;
@@ -53,22 +53,21 @@ public class GameStage2 extends Stage implements ContactListener
        // walkAnimation = player.getWalkAnimation();
         map = ground.getMap();
         batch = new SpriteBatch();
-*/
-/*
+
         //renderer = new OrthogonalTiledMapRenderer(map);
         debugRenderer = new Box2DDebugRenderer();
         camera = new OrthographicCamera();
 
-        camera.setToOrtho(false, Constants.VIEWPORT_WIDTH1, Constants.VIEWPORT_HEIGHT1);
+        camera.setToOrtho(false, Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         //camera.setToOrtho(false, Constants. , 2500);
         //camera.setToOrtho(false, 500, 250);
         //camera.position.set(Constants., 875, 0f);
 
-        camera.position.set(Constants.VIEWPORT_WIDTH1 / 2, Constants.VIEWPORT_HEIGHT1 / 2, 0);
+        camera.position.set(Constants.VIEWPORT_WIDTH / 2, Constants.VIEWPORT_HEIGHT / 2, 0);
         //camera.position.set(Constants.MAP_WIDTH * Constants.TILE_SIZE / 2, Constants.MAP_HEIGHT * Constants.TILE_SIZE / 2, 0f);
 
 
-*//*
+
 
 
 
@@ -105,13 +104,6 @@ public class GameStage2 extends Stage implements ContactListener
     @Override
     public void beginContact(Contact contact)
     {
-*/
-/*        Body a = contact.getFixtureA().getBody();
-        Body b = contact.getFixtureB().getBody();
-        if(a == player.getBody() || b == player.getBody())
-        {
-            player.landed();
-        }*//*
 
     }
 
@@ -133,4 +125,3 @@ public class GameStage2 extends Stage implements ContactListener
 
     }
 }
-*/

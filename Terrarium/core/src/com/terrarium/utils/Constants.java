@@ -15,6 +15,9 @@ public class Constants
     public static final int VIEWPORT_WIDTH = APP_WIDTH / PIXELS_PER_METER;
     public static final int VIEWPORT_HEIGHT = APP_HEIGHT / PIXELS_PER_METER;
 
+    //Sheet 576 x 256
+    //tile size 64x64
+
 
     //public static final int VIEWPORT_WIDTH = Gdx.graphics.getWidth() / PIXELS_PER_METER;
     //public static final int VIEWPORT_HEIGHT = VIEWPORT_WIDTH * Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
@@ -24,8 +27,10 @@ public class Constants
 
     public static final float PLAYER_X = 2;
     public static final float PLAYER_Y = 4;
-    public static final float PLAYER_WIDTH = 34f;
+    public static final float PLAYER_WIDTH = 25f; //34
     public static final float PLAYER_HEIGHT = 55f;
+    public static final float PLAYER_TILE = 64f;
+    public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 13f);
     public static float RUNNER_DENSITY = 0.5f;
     public static final float RUNNER_GRAVITY_SCALE = 3f;
 
