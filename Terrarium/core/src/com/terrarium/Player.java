@@ -14,9 +14,8 @@ import com.terrarium.utils.DrawingUtils;
 public class Player
 {
 
-    Vector2 position;
     private SpriteState state;
-    private SpriteState previousState;
+    private SpriteState jumpingState;
 
     private static final int FRAME_COLS = 9;
     private static final int FRAME_ROWS = 4;
@@ -36,72 +35,42 @@ public class Player
     Animation<TextureRegion> rightAnimation;
     TextureRegion jumpLeft;
     TextureRegion jumpRight;
+    int remainingJumpFrames;
 
     float stateTime;
 
-    public void setXPosition(float x)
-    {
-        position.x = x;
-    }
-    public void setYPosition(float y)
-    {
-        position.y = y;
-    }
-    public Vector2 getPosition()
-    {
-        return position;
-    }
-    public SpriteState getState()
-    {
-        return state;
-    }
-    public void setState(SpriteState state)
-    {
-        if(this.state != state)
-        {
-            previousState = this.state;
-            this.state = state;
-        }
-    }
-    public void jump()
-    {
-        if(state != SpriteState.JUMPING)
-        {
-            playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-        }
-        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-    }
+
 
     public Player(World world)
     {
-
+        remainingJumpFrames = Constants.PLAYER_JUMP_FRAMES;
         stateTime = 0f;
+        createBody(world);
+        createAnimations();
+    }
 
-        position = new Vector2(15,14);
-        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
+    private void createBody(World world)
+    {
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
-        playerBodyDef.position.set(position);
+        playerBodyDef.fixedRotation = true;
+        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
         playerBody = world.createBody(playerBodyDef);
-
-        walkLeft = new TextureRegion[FRAME_COLS];
-        walkRight = new TextureRegion[FRAME_COLS];
-
+        playerBody.setUserData("Player");
         createFixture();
-        createAnimations();
     }
 
     private void createFixture()
     {
-        state = SpriteState.JUMPING;
-        previousState = SpriteState.RIGHT;
+        state = SpriteState.RIGHT;
+        jumpingState = SpriteState.LANDED;
         PolygonShape playerBox = new PolygonShape();
         playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = playerBox;
-        fixtureDef.density = 0.9f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.5f;
+        fixtureDef.density = Constants.PLAYER_DENSITY;
+        fixtureDef.friction = Constants.PLAYER_FRICTION;
+        fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
         playerFixture = playerBody.createFixture(fixtureDef);
         playerBox.dispose();
     }
@@ -110,12 +79,17 @@ public class Player
     {
         spriteSheet = AssetLoader.textureLoader("core/assets/goldArmor.png");
 
+        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
+
+
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet,
-                spriteSheet.getWidth() / FRAME_COLS, spriteSheet.getHeight() / FRAME_ROWS);
+                spriteSheet.getWidth() / FRAME_COLS,
+                spriteSheet.getHeight() / FRAME_ROWS);
 
         jumpLeft = tmp[1][1];
         jumpRight = tmp[3][1];
-
+        walkLeft = new TextureRegion[FRAME_COLS];
+        walkRight = new TextureRegion[FRAME_COLS];
         for (int i = 0; i < FRAME_COLS; i++)
         {
             walkLeft[i] = tmp[1][i];
@@ -123,56 +97,89 @@ public class Player
         }
         leftAnimation = new Animation<TextureRegion>(frameTiming, walkLeft);
         rightAnimation = new Animation<TextureRegion>(frameTiming, walkRight);
+
     }
 
-    public void draw(SpriteBatch batch)
+    public void jump()
+    {
+        if(jumpingState != SpriteState.AIRBORNE)
+        {
+            playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+            jumpingState = SpriteState.AIRBORNE;
+        }
+    }
+
+
+    public void update(SpriteBatch batch)
     {
         stateTime += Gdx.graphics.getDeltaTime();
-        playerBodyDef.position.set(position);
-        if(state == SpriteState.LEFT)
+        if(jumpingState == SpriteState.AIRBORNE && state == SpriteState.LEFT)
+        {
+            draw(batch, jumpLeft);
+
+        }
+        else if(jumpingState == SpriteState.AIRBORNE && state == SpriteState.RIGHT)
+        {
+            jump();
+            draw(batch, jumpRight);
+        }
+        else if(state == SpriteState.LEFT )
         {
             TextureRegion currentFrame = leftAnimation.getKeyFrame(stateTime, true);
-            batch.draw(currentFrame,
-                    //Width
-                    DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 - 1,
-                    //Height
-                    DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
-
+            draw(batch, currentFrame);
         }
         else if(state == SpriteState.RIGHT)
         {
 
             TextureRegion currentFrame = rightAnimation.getKeyFrame(stateTime, true);
-            batch.draw(currentFrame,
-                    //Width
-                    DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 + 1,
-                    //Height
-                    DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
+            draw(batch, currentFrame);
         }
-        else if(state == SpriteState.JUMPING && previousState == SpriteState.LEFT)
-        {
-            batch.draw(jumpLeft,
-                    //Width
-                    DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 - 1,
-                    //Height
-                    DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
 
-        }
-        else if(state == SpriteState.JUMPING && previousState == SpriteState.RIGHT)
-        {
-            batch.draw(jumpRight,
-                    //Width
-                    DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 + 1,
-                    //Height
-                    DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
-        }
+    }
+
+    private void draw(Batch batch, TextureRegion textureRegion)
+    {
+/*
+           batch.draw(textureRegion,
+                //Width
+                DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 + 1,
+                //Height
+                DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
+*/
+        batch.draw(textureRegion,
+                //Width
+                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.x) - Constants.PLAYER_TILE / 2,
+                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
     }
 
     public void dispose()
     {
         spriteSheet.dispose();
     }
+    public Body getBody()
+    {
+        return playerBody;
+    }
+    public SpriteState getState()
+    {
+        return state;
+    }
+    public SpriteState getJumpingState()
+    {
+        return jumpingState;
+    }
+    public void setState(SpriteState state)
+    {
 
+        this.state = state;
+
+    }
+    public void setJumpingState(SpriteState jumpingState)
+    {
+
+        this.jumpingState = jumpingState;
+
+    }
 }
 
 

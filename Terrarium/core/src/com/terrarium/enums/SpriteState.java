@@ -4,9 +4,9 @@ public enum SpriteState
 {
     LEFT,
     RIGHT,
-    UP,
-    DOWN,
+    STILL,
     JUMPING,
+    AIRBORNE,
     LANDED;
 
 }
