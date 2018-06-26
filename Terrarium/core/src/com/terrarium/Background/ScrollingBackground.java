@@ -2,43 +2,42 @@ package com.terrarium.Background;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.terrarium.assets.AssetLoader;
 import com.terrarium.enums.SpriteState;
 import com.terrarium.utils.Constants;
-import com.terrarium.utils.DrawingUtils;
 
 public class ScrollingBackground
 {
 
-    public static final int DEFAULT_SPEED = 80;
-
-
-
-    Texture skyTexture;
-    Texture goldStill;
+    Texture backgroundTexture;
     float x1;
     float x2;
     float speed;
     float imageScale;
     float textureWidth;
 
-    public ScrollingBackground()
+    public ScrollingBackground(Texture backgroundTexture, float moveSpeed)
     {
-        goldStill = AssetLoader.textureLoader("core/assets/goldStill.png");
-        skyTexture = AssetLoader.textureLoader("core/assets/sky.png");
-        textureWidth = Constants.APP_WIDTH;
+        this.backgroundTexture = backgroundTexture;
+        if(backgroundTexture.getWidth() < Constants.APP_WIDTH)
+        {
+            textureWidth = backgroundTexture.getWidth();
+        }
+        else
+        {
+
+            textureWidth = Constants.APP_WIDTH;
+        }
         x1 = 0;
         x2 = textureWidth;
         imageScale = 0;
-        speed = 100;
+        speed = moveSpeed;
     }
 
-    public void updateAndRender(SpriteBatch batch, float deltaTime, SpriteState.Direction direction, SpriteState.State state)
+    public void updateAndRender(SpriteBatch batch, float deltaTime, SpriteState.Direction direction, boolean moving)
     {
 
-        if(state != SpriteState.State.STILL)
+        if(moving)
         {
             if (direction == SpriteState.Direction.LEFT)
             {
@@ -64,15 +63,15 @@ public class ScrollingBackground
                 }
             }
         }
-        batch.draw(skyTexture, x1, 0, Gdx.graphics.getWidth() ,Gdx.graphics.getHeight());
-        batch.draw(skyTexture, x2, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(backgroundTexture, x1, 0, Gdx.graphics.getWidth() ,Gdx.graphics.getHeight());
+        batch.draw(backgroundTexture, x2, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
     }
 
 
     public void resize(int width, int height)
     {
-        imageScale = width / skyTexture.getWidth();
+        imageScale = width / backgroundTexture.getWidth();
     }
 }
 

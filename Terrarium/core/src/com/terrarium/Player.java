@@ -40,11 +40,14 @@ public class Player
     TextureRegion stillLeft;
     TextureRegion stillRight;
 
+    boolean moving;
+
 
     public Player(World world)
     {
+        moving = false;
         direction = SpriteState.Direction.LEFT;
-        state = SpriteState.State.LANDED;
+        state = SpriteState.State.AIRBORNE;
         createBody(world);
         createAnimations();
     }
@@ -102,19 +105,98 @@ public class Player
 
     public void jump()
     {
-        if(state == SpriteState.State.JUMPING)
-        {
-            state = SpriteState.State.AIRBORNE;
-            playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-        }
+        state = SpriteState.State.AIRBORNE;
+        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
     }
 
 
     public void update(SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
-/*
 
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && state != SpriteState.State.AIRBORNE)
+        {
+            jump();
+            if(direction == SpriteState.Direction.LEFT)
+            {
+                draw(batch, stillLeft);
+            }
+            else
+            {
+                draw(batch, stillRight);
+            }
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.A))
+        {
+            moving = true;
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.GROUNDED;
+            }
+            setDirection(SpriteState.Direction.LEFT);
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.GROUNDED;
+            }
+            if(state == SpriteState.State.AIRBORNE)
+            {
+                draw(batch, jumpLeft);
+            }
+            else
+            {
+                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.D))
+        {
+            moving = true;
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.GROUNDED;
+            }
+            setDirection(SpriteState.Direction.RIGHT);
+            if(state == SpriteState.State.AIRBORNE)
+            {
+                draw(batch, jumpRight);
+            }
+            else
+            {
+                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+        }
+        else if(state == SpriteState.State.AIRBORNE)
+        {
+            if(direction == SpriteState.Direction.LEFT)
+            {
+                draw(batch, jumpLeft);
+            }
+            else if(direction == SpriteState.Direction.RIGHT)
+            {
+                draw(batch, jumpRight);
+            }
+        }
+        else
+        {
+            moving = false;
+            if(direction == SpriteState.Direction.LEFT)
+            {
+                direction = SpriteState.Direction.LEFT;
+                draw(batch, stillLeft);
+            }
+            else
+            {
+                direction = SpriteState.Direction.RIGHT;
+                draw(batch, stillRight);
+            }
+        }
+
+
+        //-------------------------------------//
+/*
         if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.LEFT)
         {
             draw(batch, jumpLeft);
@@ -146,94 +228,16 @@ public class Player
 
 */
 
-        //-------------------------------------//
-
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A))
-        {
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.LANDED;
-            }
-            setDirection(SpriteState.Direction.LEFT);
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.LANDED;
-            }
-            if(state == SpriteState.State.AIRBORNE)
-            {
-                draw(batch, jumpLeft);
-            }
-            else
-            {
-                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
-            }
-
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D))
-        {
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.LANDED;
-            }
-            setDirection(SpriteState.Direction.RIGHT);
-            if(state == SpriteState.State.AIRBORNE)
-            {
-                draw(batch, jumpRight);
-            }
-            else
-            {
-                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
-            }
-        }
-        else
-        {
-            setState(SpriteState.State.STILL);
-            if(direction == SpriteState.Direction.LEFT)
-            {
-                draw(batch, stillLeft);
-            }
-            else
-            {
-                draw(batch, stillRight);
-            }
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && state != SpriteState.State.AIRBORNE)
-        {
-            setState(SpriteState.State.JUMPING);
-
-            jump();
-
-/*            if(direction == SpriteState.Direction.LEFT)
-            {
-                draw(batch, jumpLeft);
-            }
-            else if(direction == SpriteState.Direction.RIGHT)
-            {
-                draw(batch, jumpRight);
-            }*/
-        }
-
-
-
     }
 
     private void draw(Batch batch, TextureRegion textureRegion)
     {
-/*
-           batch.draw(textureRegion,
-                //Width
-                DrawingUtils.metersToPixels(playerBody.getPosition().x) - Constants.PLAYER_TILE / 2 + 1,
-                //Height
-                DrawingUtils.metersToPixels(playerBody.getPosition().y) - Constants.PLAYER_HEIGHT / 2);
-*/
         batch.draw(textureRegion,
                 //Width
                 DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.x) - Constants.PLAYER_TILE / 2,
                 DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
     }
+
 
     public void dispose()
     {
@@ -258,5 +262,9 @@ public class Player
     public void setState(SpriteState.State state)
     {
         this.state = state;
+    }
+    public boolean getMoving()
+    {
+        return moving;
     }
 }

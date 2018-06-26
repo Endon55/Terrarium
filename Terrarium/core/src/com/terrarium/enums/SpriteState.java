@@ -9,10 +9,8 @@ public class SpriteState
     }
     public enum State
     {
-        JUMPING,
         AIRBORNE,
-        LANDED,
-        STILL
+        GROUNDED
     }
 
 }

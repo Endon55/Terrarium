@@ -2,7 +2,6 @@ package com.terrarium.stages;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -28,30 +27,13 @@ public class GameStage extends Stage implements ContactListener
     BodyDef groundBodyDef;
     Player player;
     Body ground;
-    ParallaxBackground background;
-    Texture skyTexture;
-    TextureRegion skyRegion;
     ScrollingBackground scrollingBackground;
-    ParallaxBackground rbg;
     float stateTime;
 
     public GameStage()
     {
-
-
-        scrollingBackground = new ScrollingBackground();
+        scrollingBackground = new ScrollingBackground(AssetLoader.textureLoader("core/assets/sky.png"), Constants.BACKGROUND_MOVE_SPEED);
         stateTime = 0;
-        skyTexture = AssetLoader.textureLoader("core/assets/sky.png");
-/*
-        TextureRegion[][] tmp = TextureRegion.split(skyTexture, skyTexture.getWidth(), skyTexture.getHeight());
-        skyRegion = tmp[0][0];
-        rbg = new ParallaxBackground(new ParallaxLayer[]{
-                new ParallaxLayer(skyRegion ,
-                        new Vector2(1, 1),
-                        new Vector2(0, 0))}, Constants.APP_WIDTH, Constants.APP_HEIGHT,
-                new Vector2(DrawingUtils.pixelsToMeters(-5),0));
-*/
-
 
         world = WorldUtils.createWorld();
         world.setContactListener(this);
@@ -83,7 +65,7 @@ public class GameStage extends Stage implements ContactListener
         world.step(1 / 60f, 6, 2);
         batch.begin();
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
-        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getState());
+        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
         player.update(batch, stateTime);
         camera.update();
         batch.end();
@@ -99,7 +81,7 @@ public class GameStage extends Stage implements ContactListener
         Body b = contact.getFixtureB().getBody();
         if((a.getUserData() == "Player" && b.getUserData() == "Ground") || (a.getUserData() == "Ground" && b.getUserData() == "Player"))
         {
-            player.setState(SpriteState.State.LANDED);
+            player.setState(SpriteState.State.GROUNDED);
             System.out.println("landed");
         }
     }
