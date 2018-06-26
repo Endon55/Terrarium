@@ -1,12 +1,19 @@
 package com.terrarium.enums;
 
-public enum SpriteState
+public class SpriteState
 {
-    LEFT,
-    RIGHT,
-    STILL,
-    JUMPING,
-    AIRBORNE,
-    LANDED;
+    public enum Direction
+    {
+        LEFT,
+        RIGHT
+    }
+    public enum State
+    {
+        JUMPING,
+        AIRBORNE,
+        LANDED,
+        STILL
+    }
 
 }
+

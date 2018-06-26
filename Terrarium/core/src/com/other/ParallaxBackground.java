@@ -1,4 +1,4 @@
-package com.terrarium.Background;
+package com.other;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

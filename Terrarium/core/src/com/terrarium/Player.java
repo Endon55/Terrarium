@@ -1,6 +1,7 @@
 package com.terrarium;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -14,13 +15,13 @@ import com.terrarium.utils.DrawingUtils;
 public class Player
 {
 
-    private SpriteState state;
-    private SpriteState jumpingState;
+    private SpriteState.Direction direction;
+    private SpriteState.State state;
 
     private static final int FRAME_COLS = 9;
     private static final int FRAME_ROWS = 4;
 
-    float frameTiming = 0.045f;
+    float frameTiming = 0.065f;
 
     Body playerBody;
     BodyDef playerBodyDef;
@@ -35,16 +36,15 @@ public class Player
     Animation<TextureRegion> rightAnimation;
     TextureRegion jumpLeft;
     TextureRegion jumpRight;
-    int remainingJumpFrames;
 
-    float stateTime;
-
+    TextureRegion stillLeft;
+    TextureRegion stillRight;
 
 
     public Player(World world)
     {
-        remainingJumpFrames = Constants.PLAYER_JUMP_FRAMES;
-        stateTime = 0f;
+        direction = SpriteState.Direction.LEFT;
+        state = SpriteState.State.LANDED;
         createBody(world);
         createAnimations();
     }
@@ -62,8 +62,6 @@ public class Player
 
     private void createFixture()
     {
-        state = SpriteState.RIGHT;
-        jumpingState = SpriteState.LANDED;
         PolygonShape playerBox = new PolygonShape();
         playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
         FixtureDef fixtureDef = new FixtureDef();
@@ -88,6 +86,8 @@ public class Player
 
         jumpLeft = tmp[1][1];
         jumpRight = tmp[3][1];
+        stillLeft = tmp[1][0];
+        stillRight = tmp[3][0];
         walkLeft = new TextureRegion[FRAME_COLS];
         walkRight = new TextureRegion[FRAME_COLS];
         for (int i = 0; i < FRAME_COLS; i++)
@@ -102,38 +102,121 @@ public class Player
 
     public void jump()
     {
-        if(jumpingState != SpriteState.AIRBORNE)
+        if(state == SpriteState.State.JUMPING)
         {
+            state = SpriteState.State.AIRBORNE;
             playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-            jumpingState = SpriteState.AIRBORNE;
         }
     }
 
 
-    public void update(SpriteBatch batch)
+    public void update(SpriteBatch batch, float deltaTime)
     {
-        stateTime += Gdx.graphics.getDeltaTime();
-        if(jumpingState == SpriteState.AIRBORNE && state == SpriteState.LEFT)
+        deltaTime += Gdx.graphics.getDeltaTime();
+/*
+
+        if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.LEFT)
         {
             draw(batch, jumpLeft);
 
         }
-        else if(jumpingState == SpriteState.AIRBORNE && state == SpriteState.RIGHT)
+        else if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.RIGHT)
         {
-            jump();
             draw(batch, jumpRight);
         }
-        else if(state == SpriteState.LEFT )
+        else if(direction == SpriteState.Direction.LEFT)
         {
-            TextureRegion currentFrame = leftAnimation.getKeyFrame(stateTime, true);
+            TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
             draw(batch, currentFrame);
         }
-        else if(state == SpriteState.RIGHT)
+        else if(direction == SpriteState.Direction.RIGHT)
         {
 
-            TextureRegion currentFrame = rightAnimation.getKeyFrame(stateTime, true);
+            TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
             draw(batch, currentFrame);
         }
+        else if(state == SpriteState.State.STILL && direction == SpriteState.Direction.LEFT)
+        {
+            draw(batch, stillLeft);
+        }
+        else if(state == SpriteState.State.STILL && direction == SpriteState.Direction.RIGHT)
+        {
+            draw(batch, stillRight);
+        }
+
+*/
+
+        //-------------------------------------//
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.A))
+        {
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.LANDED;
+            }
+            setDirection(SpriteState.Direction.LEFT);
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.LANDED;
+            }
+            if(state == SpriteState.State.AIRBORNE)
+            {
+                draw(batch, jumpLeft);
+            }
+            else
+            {
+                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+
+        }
+        else if (Gdx.input.isKeyPressed(Input.Keys.D))
+        {
+            if(state != SpriteState.State.AIRBORNE)
+            {
+                state = SpriteState.State.LANDED;
+            }
+            setDirection(SpriteState.Direction.RIGHT);
+            if(state == SpriteState.State.AIRBORNE)
+            {
+                draw(batch, jumpRight);
+            }
+            else
+            {
+                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+        }
+        else
+        {
+            setState(SpriteState.State.STILL);
+            if(direction == SpriteState.Direction.LEFT)
+            {
+                draw(batch, stillLeft);
+            }
+            else
+            {
+                draw(batch, stillRight);
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && state != SpriteState.State.AIRBORNE)
+        {
+            setState(SpriteState.State.JUMPING);
+
+            jump();
+
+/*            if(direction == SpriteState.Direction.LEFT)
+            {
+                draw(batch, jumpLeft);
+            }
+            else if(direction == SpriteState.Direction.RIGHT)
+            {
+                draw(batch, jumpRight);
+            }*/
+        }
+
+
 
     }
 
@@ -160,151 +243,20 @@ public class Player
     {
         return playerBody;
     }
-    public SpriteState getState()
+    public SpriteState.Direction getDirection()
+    {
+        return direction;
+    }
+    public void setDirection(SpriteState.Direction direction)
+    {
+        this.direction = direction;
+    }
+    public SpriteState.State getState()
     {
         return state;
     }
-    public SpriteState getJumpingState()
+    public void setState(SpriteState.State state)
     {
-        return jumpingState;
-    }
-    public void setState(SpriteState state)
-    {
-
         this.state = state;
-
-    }
-    public void setJumpingState(SpriteState jumpingState)
-    {
-
-        this.jumpingState = jumpingState;
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-public class Player
-{
-
-    private boolean landed;
-
-    private static final int FRAME_COLS = 9;
-    private static final int FRAME_ROWS = 4;
-
-    Animation<TextureRegion> walkAnimation;
-    TextureRegion[][] textureRegion;
-    TextureRegion[] walkFrames;
-    Texture playerTexture;
-    Vector2 location = new Vector2(Constants.APP_WIDTH / 2, Constants.APP_HEIGHT / 2);
-    Sprite sprite;
-    Body body;
-    BodyDef bodyDef;
-    float stateTime;
-
-
-    public Player(World world)
-    {
-
-
-        stateTime = 0f;
-        playerTexture = AssetLoader.textureLoader("core/assets/goldArmor.png");
-        sprite = new Sprite(playerTexture);
-        this.sprite.setPosition(0, 0);
-        textureRegion = TextureRegion.split(playerTexture, playerTexture.getWidth() / FRAME_COLS, playerTexture.getHeight() / FRAME_ROWS);
-        walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-        int index = 0;
-        for (int i = 0; i < FRAME_ROWS; i++)
-        {
-            for (int j = 0; j < FRAME_COLS; j++)
-            {
-                walkFrames[index++] = textureRegion[i][j];
-            }
-        }
-
-        walkAnimation = new Animation<TextureRegion>(.025f, walkFrames);
-
-
-
-        //box
-
-        bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0, 60);
-
-        body = world.createBody(bodyDef);
-        PolygonShape box = new PolygonShape();
-        box.setAsBox(1, 2);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = box;
-        fixtureDef.density = 0.5f;
-        fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.6f;
-        Fixture fixture = body.createFixture(fixtureDef);
-
-        box.dispose();
-
-    }
-
-    public Body getBody()
-    {
-        return body;
-    }
-
-    public void landed()
-    {
-        landed = true;
-    }
-
-    public Sprite getSprite()
-    {
-        return sprite;
-    }
-    public Vector2 getLocation()
-    {
-        return location;
-    }
-
-    public void setLocation(Vector2 location)
-    {
-        this.location = location;
-    }
-    public Animation<TextureRegion> getWalkAnimation()
-    {
-        return walkAnimation;
-    }
-
-
-
-
-    public void draw(Batch batch, World world)
-    {
-        Vector2 bodyVec = body.getPosition();
-        location.x = (bodyVec.x - Constants.RUNNER_WIDTH);
-        location.y = (bodyVec.y - Constants.RUNNER_HEIGHT);
-
-        //System.out.println("x: " + location.x + "y: " + location.y );
-        //System.out.println("x: " + bodyVec.x + "y: " + bodyVec.y );
-        stateTime += Gdx.graphics.getDeltaTime();
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, location.x, location.y);
-
-    }
-
-
-}
-*/

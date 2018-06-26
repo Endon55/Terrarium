@@ -1,4 +1,4 @@
-package com.terrarium;
+package com.terrarium.GameScreens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

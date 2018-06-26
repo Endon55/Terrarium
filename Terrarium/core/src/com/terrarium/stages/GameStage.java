@@ -1,16 +1,14 @@
 package com.terrarium.stages;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.terrarium.Background.ParallaxBackground;
-import com.terrarium.Background.ParallaxLayer;
-import com.terrarium.Sky;
+import com.other.ParallaxBackground;
+import com.terrarium.Background.ScrollingBackground;
 import com.terrarium.UserInputProcessor;
 import com.terrarium.Player;
 import com.terrarium.assets.AssetLoader;
@@ -29,20 +27,32 @@ public class GameStage extends Stage implements ContactListener
     SpriteBatch batch;
     BodyDef groundBodyDef;
     Player player;
-    Sky sky;
     Body ground;
     ParallaxBackground background;
     Texture skyTexture;
     TextureRegion skyRegion;
+    ScrollingBackground scrollingBackground;
+    ParallaxBackground rbg;
+    float stateTime;
 
     public GameStage()
     {
+
+
+        scrollingBackground = new ScrollingBackground();
+        stateTime = 0;
         skyTexture = AssetLoader.textureLoader("core/assets/sky.png");
-        TextureRegion[][] tmp = TextureRegion.split(skyTexture, 1, 1);
+/*
+        TextureRegion[][] tmp = TextureRegion.split(skyTexture, skyTexture.getWidth(), skyTexture.getHeight());
         skyRegion = tmp[0][0];
-        background = new ParallaxBackground(new ParallaxLayer[]{
-                new ParallaxLayer(skyRegion, new Vector2(1, 1), new Vector2(0, 0)),
-        }, 1080, 720, new Vector2(50, 0));
+        rbg = new ParallaxBackground(new ParallaxLayer[]{
+                new ParallaxLayer(skyRegion ,
+                        new Vector2(1, 1),
+                        new Vector2(0, 0))}, Constants.APP_WIDTH, Constants.APP_HEIGHT,
+                new Vector2(DrawingUtils.pixelsToMeters(-5),0));
+*/
+
+
         world = WorldUtils.createWorld();
         world.setContactListener(this);
         player = new Player(world);
@@ -69,27 +79,13 @@ public class GameStage extends Stage implements ContactListener
     @Override
     public void draw()
     {
+        stateTime += Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);
         batch.begin();
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
-
-        //sky.draw(batch);
-        if (Gdx.input.isKeyPressed(Input.Keys.A))
-        {
-            player.setState(SpriteState.LEFT);
-
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D))
-        {
-            player.setState(SpriteState.RIGHT);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
-        {
-            if(player.getJumpingState() == SpriteState.LANDED)
-            {
-                player.jump();
-            }
-        }
+        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getState());
+        player.update(batch, stateTime);
         camera.update();
-        player.update(batch);
         batch.end();
         debugRenderer.render(world, camera.combined);
     }
@@ -103,7 +99,7 @@ public class GameStage extends Stage implements ContactListener
         Body b = contact.getFixtureB().getBody();
         if((a.getUserData() == "Player" && b.getUserData() == "Ground") || (a.getUserData() == "Ground" && b.getUserData() == "Player"))
         {
-            player.setJumpingState(SpriteState.LANDED);
+            player.setState(SpriteState.State.LANDED);
             System.out.println("landed");
         }
     }
