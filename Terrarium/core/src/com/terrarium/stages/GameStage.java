@@ -1,17 +1,22 @@
 package com.terrarium.stages;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.tiled.*;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.other.ParallaxBackground;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.terrarium.Background.ScrollingBackground;
-import com.terrarium.UserInputProcessor;
 import com.terrarium.Player;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.enums.SpriteState;
+import com.terrarium.map.MapBuilder;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.WorldUtils;
 
@@ -20,24 +25,42 @@ public class GameStage extends Stage implements ContactListener
     private OrthographicCamera camera;
     private Box2DDebugRenderer debugRenderer;
 
-    UserInputProcessor input;
-
     World world;
     SpriteBatch batch;
     BodyDef groundBodyDef;
     Player player;
     Body ground;
+    MapBuilder mapBuilder;
+    TiledMap map;
+    TmxMapLoader loader;
+    AssetManager manager;
     ScrollingBackground scrollingBackground;
+    TiledMapRenderer mapRenderer;
     float stateTime;
 
     public GameStage()
     {
+
+/*
+
+
+        manager = new AssetManager();
+        manager.setLoader(TiledMap.class, new TmxMapLoader());
+        manager.load(mapPath, TiledMap.class);
+        manager.finishLoading();
+        map = manager.get(mapPath, TiledMap.class);
+*/
+        mapBuilder = new MapBuilder();
         scrollingBackground = new ScrollingBackground(AssetLoader.textureLoader("core/assets/sky.png"), Constants.BACKGROUND_MOVE_SPEED);
         stateTime = 0;
 
         world = WorldUtils.createWorld();
+
         world.setContactListener(this);
+
         player = new Player(world);
+
+        //mapBuilder.buildShapes(map, (float)Constants.TILE_SIZE, world);
         debugRenderer = new Box2DDebugRenderer();
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
@@ -45,7 +68,7 @@ public class GameStage extends Stage implements ContactListener
         batch = new SpriteBatch();
 
 
-        //ground
+        //map
         groundBodyDef = new BodyDef();
         groundBodyDef.position.set(new Vector2(0, 1));
         ground = world.createBody(groundBodyDef);
@@ -61,12 +84,13 @@ public class GameStage extends Stage implements ContactListener
     @Override
     public void draw()
     {
+        mapBuilder.render(camera);
         stateTime += Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);
         batch.begin();
-        camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
-        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
+        //scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
         player.update(batch, stateTime);
+        camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
         camera.update();
         batch.end();
         debugRenderer.render(world, camera.combined);

@@ -130,6 +130,7 @@ public class Player
         else if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
             moving = true;
+            walk();
             if(state != SpriteState.State.AIRBORNE)
             {
                 state = SpriteState.State.GROUNDED;
@@ -153,6 +154,7 @@ public class Player
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
         {
             moving = true;
+            walk();
             if(state != SpriteState.State.AIRBORNE)
             {
                 state = SpriteState.State.GROUNDED;
@@ -238,6 +240,16 @@ public class Player
                 DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
     }
 
+
+    private void walk()
+    {
+        if(direction == SpriteState.Direction.RIGHT && moving)
+        {
+            playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+        }
+        else if(direction == SpriteState.Direction.LEFT && moving)
+        playerBody.applyLinearImpulse(new Vector2(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE.x * -1, 0), playerBody.getWorldCenter(), true);
+    }
 
     public void dispose()
     {

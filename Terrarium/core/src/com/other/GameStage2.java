@@ -1,32 +1,26 @@
 
-package com.terrarium.stages;
+/*
+package com.other;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.terrarium.Ground;
+import com.terrarium.map.Ground;
 import com.terrarium.Player;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.WorldUtils;
-
-import java.awt.*;
 
 public class GameStage2 extends Stage implements ContactListener
 {
 
     World world;
-    private Ground ground;
     private Player player;
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer renderer;
@@ -48,10 +42,10 @@ public class GameStage2 extends Stage implements ContactListener
     {
         //screenRightSide = new Rectangle(getCamera().viewportWidth / 2, 0, getCamera().viewportWidth / 2, getCamera().viewportHeight);
         world = WorldUtils.createWorld();
-        ground = new Ground(world);
+        map = new Ground(world);
         player = new Player(world);
        // walkAnimation = player.getWalkAnimation();
-        map = ground.getMap();
+        map = map.getMap();
         batch = new SpriteBatch();
 
         //renderer = new OrthogonalTiledMapRenderer(map);
@@ -125,3 +119,6 @@ public class GameStage2 extends Stage implements ContactListener
 
     }
 }
+
+
+*/
