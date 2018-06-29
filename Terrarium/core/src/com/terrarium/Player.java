@@ -2,6 +2,7 @@ package com.terrarium;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +18,7 @@ public class Player
 
     private SpriteState.Direction direction;
     private SpriteState.State state;
+    private OrthographicCamera camera;
 
     private static final int FRAME_COLS = 9;
     private static final int FRAME_ROWS = 4;
@@ -45,6 +47,7 @@ public class Player
 
     public Player(World world)
     {
+        camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
@@ -197,6 +200,8 @@ public class Player
         }
 
 
+        camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
+        camera.update();
         //-------------------------------------//
 /*
         if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.LEFT)

@@ -41,34 +41,21 @@ public class GameStage extends Stage implements ContactListener
     public GameStage()
     {
 
-/*
-
-
-        manager = new AssetManager();
-        manager.setLoader(TiledMap.class, new TmxMapLoader());
-        manager.load(mapPath, TiledMap.class);
-        manager.finishLoading();
-        map = manager.get(mapPath, TiledMap.class);
-*/
-        mapBuilder = new MapBuilder();
-        scrollingBackground = new ScrollingBackground(AssetLoader.textureLoader("core/assets/sky.png"), Constants.BACKGROUND_MOVE_SPEED);
-        stateTime = 0;
-
-        world = WorldUtils.createWorld();
-
-        world.setContactListener(this);
-
-        player = new Player(world);
-
-        //mapBuilder.buildShapes(map, (float)Constants.TILE_SIZE, world);
         debugRenderer = new Box2DDebugRenderer();
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
-        camera.update();
+        scrollingBackground = new ScrollingBackground(AssetLoader.textureLoader("core/assets/sky.png"), Constants.BACKGROUND_MOVE_SPEED);
+        stateTime = 0;
+
+
+        world = WorldUtils.createWorld();
+        player = new Player(world);
+        world.setContactListener(this);
+        mapBuilder = new MapBuilder();
         batch = new SpriteBatch();
 
 
-        //map
+        //floor
         groundBodyDef = new BodyDef();
         groundBodyDef.position.set(new Vector2(0, 1));
         ground = world.createBody(groundBodyDef);
@@ -79,6 +66,7 @@ public class GameStage extends Stage implements ContactListener
         groundBox.dispose();
         Gdx.graphics.getWidth();
 
+        camera.update();
 
     }
     @Override
