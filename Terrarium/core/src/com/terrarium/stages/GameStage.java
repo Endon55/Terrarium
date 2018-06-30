@@ -51,7 +51,7 @@ public class GameStage extends Stage implements ContactListener
         world = WorldUtils.createWorld();
         player = new Player(world);
         world.setContactListener(this);
-        mapBuilder = new MapBuilder();
+        mapBuilder = new MapBuilder(world);
         batch = new SpriteBatch();
 
 
@@ -79,6 +79,8 @@ public class GameStage extends Stage implements ContactListener
         //scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
         player.update(batch, stateTime);
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
+
+        System.out.println(player.getBody().getPosition().x);
         camera.update();
         batch.end();
         debugRenderer.render(world, camera.combined);

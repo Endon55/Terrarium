@@ -18,7 +18,6 @@ public class Constants
 
     public static final int VIEWPORT_WIDTH = APP_WIDTH / PIXELS_PER_METER;
     public static final int VIEWPORT_HEIGHT = APP_HEIGHT / PIXELS_PER_METER;
-
     //Sheet 576 x 256
     //tile size 64x64
 
@@ -39,5 +38,9 @@ public class Constants
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final float BACKGROUND_MOVE_SPEED = 50;
+
+
+    public static final float TILE_DIRT_FRICTION = 1.0f;
+
 
 }
