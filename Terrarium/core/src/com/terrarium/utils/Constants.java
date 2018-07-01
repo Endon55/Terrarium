@@ -30,17 +30,22 @@ public class Constants
     public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);
 
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE = new Vector2(1f, 0);
+    public static final float PLAYER_MAX_MOVEMENT_SPEED = 8f;
 
     public static float PLAYER_DENSITY = 0.5f;
-    public static float PLAYER_FRICTION = 5.0f;
+    public static float PLAYER_FRICTION = .9f;
     public static float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_GRAVITY_SCALE = 3f;
+
+
+
+
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final float BACKGROUND_MOVE_SPEED = 50;
 
 
-    public static final float TILE_DIRT_FRICTION = 1.0f;
+    public static final float TILE_DIRT_FRICTION = 1f;
 
 
 }

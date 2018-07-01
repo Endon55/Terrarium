@@ -1,0 +1,11 @@
+
+
+Collision box beneath players, that will be the box that sets the state of the player, it should avoid hitting and sticking to walls
+
+Clicking a tile destroys it
+Clicking a blank tile adds one
+
+Scrolling background broken
+
+
+

@@ -248,13 +248,14 @@ public class Player
 
     private void walk()
     {
-        if(direction == SpriteState.Direction.RIGHT && moving)
+        if(direction == SpriteState.Direction.RIGHT && moving && playerBody.getLinearVelocity().x < Constants.PLAYER_MAX_MOVEMENT_SPEED)
         {
             playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
         }
-        else if(direction == SpriteState.Direction.LEFT && moving)
+        else if(direction == SpriteState.Direction.LEFT && moving && playerBody.getLinearVelocity().x > Constants.PLAYER_MAX_MOVEMENT_SPEED * -1)
         playerBody.applyLinearImpulse(new Vector2(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE.x * -1, 0), playerBody.getWorldCenter(), true);
     }
+
 
     public void dispose()
     {

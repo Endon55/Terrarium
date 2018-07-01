@@ -72,17 +72,15 @@ public class GameStage extends Stage implements ContactListener
     @Override
     public void draw()
     {
-        mapBuilder.render(camera);
         stateTime += Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);
         batch.begin();
-        //scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
+        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving());
         player.update(batch, stateTime);
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
-
-        System.out.println(player.getBody().getPosition().x);
         camera.update();
         batch.end();
+        mapBuilder.render(camera);
         debugRenderer.render(world, camera.combined);
     }
 
@@ -93,7 +91,7 @@ public class GameStage extends Stage implements ContactListener
         System.out.println("contact");
         Body a = contact.getFixtureA().getBody();
         Body b = contact.getFixtureB().getBody();
-        if((a.getUserData() == "Player" && b.getUserData() == "Ground") || (a.getUserData() == "Ground" && b.getUserData() == "Player"))
+        if((a.getUserData() == "Player" && b.getUserData() == "GroundTile") || (a.getUserData() == "GroundTile" && b.getUserData() == "Player"))
         {
             player.setState(SpriteState.State.GROUNDED);
             System.out.println("landed");
