@@ -80,15 +80,19 @@ public class MapBuilder
         tileBody = world.createBody(tileBodyDef);
         tileBody.setUserData("GroundTile");
 
+/*
         PolygonShape tileBox = new PolygonShape();
         tileBox.setAsBox(.5f, .5f);
+*/
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = tileBox;
+        fixtureDef.shape = DrawingUtils.tileShape();
         fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
-        Fixture playerFixture = tileBody.createFixture(fixtureDef);
+        tileBody.createFixture(fixtureDef);
         return tileBody;
     }
+
+
 
 }
 

@@ -1,4 +1,4 @@
-package com.terrarium.map;
+package com.other;
 
 import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.MapObject;

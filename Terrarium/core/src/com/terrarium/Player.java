@@ -44,6 +44,8 @@ public class Player
 
     boolean moving;
 
+    float oldVelocity;
+
 
     public Player(World world)
     {
@@ -51,66 +53,12 @@ public class Player
         moving = false;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
+        oldVelocity = 1;
         createBody(world);
         createAnimations();
     }
 
-    private void createBody(World world)
-    {
-        playerBodyDef = new BodyDef();
-        playerBodyDef.type = BodyDef.BodyType.DynamicBody;
-        playerBodyDef.fixedRotation = true;
-        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
-        playerBody = world.createBody(playerBodyDef);
-        playerBody.setUserData("Player");
-        createFixture();
-    }
 
-    private void createFixture()
-    {
-        PolygonShape playerBox = new PolygonShape();
-        playerBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = playerBox;
-        fixtureDef.density = Constants.PLAYER_DENSITY;
-        fixtureDef.friction = Constants.PLAYER_FRICTION;
-        fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
-        playerFixture = playerBody.createFixture(fixtureDef);
-        playerBox.dispose();
-    }
-
-    private void createAnimations()
-    {
-        spriteSheet = AssetLoader.textureLoader("core/assets/goldArmor.png");
-
-        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
-
-
-        TextureRegion[][] tmp = TextureRegion.split(spriteSheet,
-                spriteSheet.getWidth() / FRAME_COLS,
-                spriteSheet.getHeight() / FRAME_ROWS);
-
-        jumpLeft = tmp[1][1];
-        jumpRight = tmp[3][1];
-        stillLeft = tmp[1][0];
-        stillRight = tmp[3][0];
-        walkLeft = new TextureRegion[FRAME_COLS];
-        walkRight = new TextureRegion[FRAME_COLS];
-        for (int i = 0; i < FRAME_COLS; i++)
-        {
-            walkLeft[i] = tmp[1][i];
-            walkRight[i] = tmp[3][i];
-        }
-        leftAnimation = new Animation<TextureRegion>(frameTiming, walkLeft);
-        rightAnimation = new Animation<TextureRegion>(frameTiming, walkRight);
-
-    }
-
-    public void jump()
-    {
-        state = SpriteState.State.AIRBORNE;
-        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-    }
 
 
     public void update(SpriteBatch batch, float deltaTime)
@@ -202,38 +150,6 @@ public class Player
 
         camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
         camera.update();
-        //-------------------------------------//
-/*
-        if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.LEFT)
-        {
-            draw(batch, jumpLeft);
-
-        }
-        else if(state == SpriteState.State.AIRBORNE && direction == SpriteState.Direction.RIGHT)
-        {
-            draw(batch, jumpRight);
-        }
-        else if(direction == SpriteState.Direction.LEFT)
-        {
-            TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-            draw(batch, currentFrame);
-        }
-        else if(direction == SpriteState.Direction.RIGHT)
-        {
-
-            TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-            draw(batch, currentFrame);
-        }
-        else if(state == SpriteState.State.STILL && direction == SpriteState.Direction.LEFT)
-        {
-            draw(batch, stillLeft);
-        }
-        else if(state == SpriteState.State.STILL && direction == SpriteState.Direction.RIGHT)
-        {
-            draw(batch, stillRight);
-        }
-
-*/
 
     }
 
@@ -245,18 +161,95 @@ public class Player
                 DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
     }
 
-
     private void walk()
     {
-        if(direction == SpriteState.Direction.RIGHT && moving && playerBody.getLinearVelocity().x < Constants.PLAYER_MAX_MOVEMENT_SPEED)
+        //!(playerBody.getLinearVelocity().x == 0 && state == SpriteState.State.AIRBORNE)
+        float currentVelocity = playerBody.getLinearVelocity().x;
+        if(!(currentVelocity == 0 && oldVelocity == 0 && state == SpriteState.State.AIRBORNE))
         {
-            playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+
+            if(direction == SpriteState.Direction.RIGHT && moving && playerBody.getLinearVelocity().x < Constants.PLAYER_MAX_MOVEMENT_SPEED)
+            {
+                playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+                oldVelocity = currentVelocity;
+            }
+            else if(direction == SpriteState.Direction.LEFT && moving && playerBody.getLinearVelocity().x > Constants.PLAYER_MAX_MOVEMENT_SPEED * -1)
+            {
+                playerBody.applyLinearImpulse(new Vector2(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE.x * -1, 0), playerBody.getWorldCenter(), true);
+                oldVelocity = currentVelocity;
+            }
         }
-        else if(direction == SpriteState.Direction.LEFT && moving && playerBody.getLinearVelocity().x > Constants.PLAYER_MAX_MOVEMENT_SPEED * -1)
-        playerBody.applyLinearImpulse(new Vector2(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE.x * -1, 0), playerBody.getWorldCenter(), true);
+    }
+
+    public void jump()
+    {
+        state = SpriteState.State.AIRBORNE;
+        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+    }
+
+    private void createBody(World world)
+    {
+        playerBodyDef = new BodyDef();
+        playerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        playerBodyDef.fixedRotation = true;
+        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
+        playerBody = world.createBody(playerBodyDef);
+        playerBody.setUserData("Player");
+
+
+        PolygonShape baseBox = new PolygonShape();
+        baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = baseBox;
+        fixtureDef.density = Constants.PLAYER_DENSITY;
+        fixtureDef.friction = Constants.PLAYER_FRICTION;
+        fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
+        playerBody.createFixture(fixtureDef);
+
+        //playerBox.dispose();
+
+/*        //sensor
+        playerBox.setAsBox(0.5f, 0.1f, new Vector2(0, -1.5f), 0);
+        fixtureDef.isSensor = true;
+        Fixture footSensorFixture = playerBody.createFixture(fixtureDef);
+        footSensorFixture.setUserData("foot");*/
+
     }
 
 
+
+
+    private void createAnimations()
+    {
+        spriteSheet = AssetLoader.textureLoader("core/assets/goldArmor.png");
+
+        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
+
+
+        TextureRegion[][] tmp = TextureRegion.split(spriteSheet,
+                spriteSheet.getWidth() / FRAME_COLS,
+                spriteSheet.getHeight() / FRAME_ROWS);
+
+        jumpLeft = tmp[1][1];
+        jumpRight = tmp[3][1];
+        stillLeft = tmp[1][0];
+        stillRight = tmp[3][0];
+        walkLeft = new TextureRegion[FRAME_COLS];
+        walkRight = new TextureRegion[FRAME_COLS];
+        for (int i = 0; i < FRAME_COLS; i++)
+        {
+            walkLeft[i] = tmp[1][i];
+            walkRight[i] = tmp[3][i];
+        }
+        leftAnimation = new Animation<TextureRegion>(frameTiming, walkLeft);
+        rightAnimation = new Animation<TextureRegion>(frameTiming, walkRight);
+
+    }
+
+    public float getMoveSpeed()
+    {
+        return playerBody.getLinearVelocity().x;
+    }
     public void dispose()
     {
         spriteSheet.dispose();

@@ -7,6 +7,7 @@ public class Constants
 {
     //App Constants
     public static final int TILE_SIZE = 20;
+    public static final int TILE_SHEAR = 6;
     public static final int PIXELS_PER_METER = 20;
     public static final int MAP_WIDTH = 30;
     public static final int MAP_HEIGHT = 15;
@@ -42,7 +43,7 @@ public class Constants
 
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
-    public static final float BACKGROUND_MOVE_SPEED = 50;
+    public static final float BACKGROUND_SCROLLING_RATIO = 2f;
 
 
     public static final float TILE_DIRT_FRICTION = 1f;

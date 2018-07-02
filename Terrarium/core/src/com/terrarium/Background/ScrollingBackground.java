@@ -12,7 +12,7 @@ public class ScrollingBackground
     Texture backgroundTexture;
     float x1;
     float x2;
-    float speed;
+    float delta_speed;
     float imageScale;
     float textureWidth;
 
@@ -31,18 +31,18 @@ public class ScrollingBackground
         x1 = 0;
         x2 = textureWidth;
         imageScale = 0;
-        speed = moveSpeed;
+        delta_speed = moveSpeed;
     }
 
-    public void updateAndRender(SpriteBatch batch, float deltaTime, SpriteState.Direction direction, boolean moving)
+    public void updateAndRender(SpriteBatch batch, float deltaTime, SpriteState.Direction direction, boolean moving, float moveSpeed)
     {
-
+        delta_speed = moveSpeed * Constants.BACKGROUND_SCROLLING_RATIO * deltaTime;
         if(moving)
         {
             if (direction == SpriteState.Direction.LEFT)
             {
-                x1 += speed * deltaTime;
-                x2 += speed * deltaTime;
+                x1 -= delta_speed;
+                x2 -= delta_speed;
                 if (x1 >= textureWidth)
                 {
                     x1 = x2 - textureWidth;
@@ -52,8 +52,8 @@ public class ScrollingBackground
                 }
             } else if (direction == SpriteState.Direction.RIGHT)
             {
-                x1 -= speed * deltaTime;
-                x2 -= speed * deltaTime;
+                x1 -= delta_speed;
+                x2 -= delta_speed;
                 if (x1 + textureWidth <= 0)
                 {
                     x1 = x2 + textureWidth;
