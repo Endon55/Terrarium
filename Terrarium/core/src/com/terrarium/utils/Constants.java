@@ -7,7 +7,7 @@ public class Constants
 {
     //App Constants
     public static final int TILE_SIZE = 20;
-    public static final int TILE_SHEAR = 6;
+    public static final int TILE_SHEAR = 7;
     public static final int PIXELS_PER_METER = 20;
     public static final int MAP_WIDTH = 30;
     public static final int MAP_HEIGHT = 15;
