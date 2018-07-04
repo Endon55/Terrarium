@@ -28,7 +28,6 @@ public class Player
     Body playerBody;
     BodyDef playerBodyDef;
     Texture goldTexture;
-    Fixture playerFixture;
 
 
     Texture spriteSheet;
@@ -58,9 +57,6 @@ public class Player
         createAnimations();
     }
 
-
-
-
     public void update(SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
@@ -68,58 +64,15 @@ public class Player
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && state != SpriteState.State.AIRBORNE)
         {
-            jump();
-            if(direction == SpriteState.Direction.LEFT)
-            {
-                draw(batch, stillLeft);
-            }
-            else
-            {
-                draw(batch, stillRight);
-            }
+            jump(batch);
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
-            moving = true;
-            walk();
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.GROUNDED;
-            }
-            setDirection(SpriteState.Direction.LEFT);
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.GROUNDED;
-            }
-            if(state == SpriteState.State.AIRBORNE)
-            {
-                draw(batch, jumpLeft);
-            }
-            else
-            {
-                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
-            }
-
+            leftWalk(batch, deltaTime);
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
         {
-            moving = true;
-            walk();
-            if(state != SpriteState.State.AIRBORNE)
-            {
-                state = SpriteState.State.GROUNDED;
-            }
-            setDirection(SpriteState.Direction.RIGHT);
-            if(state == SpriteState.State.AIRBORNE)
-            {
-                draw(batch, jumpRight);
-            }
-            else
-            {
-                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
-            }
+            rightWalk(batch, deltaTime);
         }
         else if(state == SpriteState.State.AIRBORNE)
         {
@@ -153,6 +106,50 @@ public class Player
 
     }
 
+    public void leftWalk(Batch batch, float deltaTime)
+    {
+        moving = true;
+        move();
+        if(state != SpriteState.State.AIRBORNE)
+        {
+            state = SpriteState.State.GROUNDED;
+        }
+        setDirection(SpriteState.Direction.LEFT);
+        if(state != SpriteState.State.AIRBORNE)
+        {
+            state = SpriteState.State.GROUNDED;
+        }
+        if(state == SpriteState.State.AIRBORNE)
+        {
+            draw(batch, jumpLeft);
+        }
+        else
+        {
+            TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
+            draw(batch, currentFrame);
+        }
+    }
+    public void rightWalk(Batch batch, float deltaTime)
+    {
+        moving = true;
+        move();
+        if(state != SpriteState.State.AIRBORNE)
+        {
+            state = SpriteState.State.GROUNDED;
+        }
+        setDirection(SpriteState.Direction.RIGHT);
+        if(state == SpriteState.State.AIRBORNE)
+        {
+            draw(batch, jumpRight);
+        }
+        else
+        {
+            TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
+            draw(batch, currentFrame);
+        }
+    }
+
+
     private void draw(Batch batch, TextureRegion textureRegion)
     {
         batch.draw(textureRegion,
@@ -161,7 +158,7 @@ public class Player
                 DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
     }
 
-    private void walk()
+    private void move()
     {
         //!(playerBody.getLinearVelocity().x == 0 && state == SpriteState.State.AIRBORNE)
         float currentVelocity = playerBody.getLinearVelocity().x;
@@ -181,13 +178,67 @@ public class Player
         }
     }
 
-    public void jump()
+    public void jump(Batch batch)
     {
         state = SpriteState.State.AIRBORNE;
         playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+
+        if(direction == SpriteState.Direction.LEFT)
+        {
+            draw(batch, stillLeft);
+        }
+        else
+        {
+            draw(batch, stillRight);
+        }
+
+
     }
 
     private void createBody(World world)
+    {
+
+
+
+
+        //this block fixes everything
+
+        playerBodyDef = new BodyDef();
+        playerBodyDef.type = BodyDef.BodyType.DynamicBody;
+        playerBodyDef.fixedRotation = true;
+        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
+        playerBody = world.createBody(playerBodyDef);
+        playerBody.setUserData("Player");
+
+
+        PolygonShape baseBox = new PolygonShape();
+        baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = baseBox;
+        fixtureDef.density = Constants.PLAYER_DENSITY;
+        fixtureDef.friction = Constants.PLAYER_FRICTION;
+        fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
+        fixtureDef.filter.categoryBits = (short) Constants.PLAYER_BITS;
+
+        playerBody.createFixture(fixtureDef);
+
+
+        //playerBox.dispose();
+
+        //sensor
+        PolygonShape footSensor = new PolygonShape();
+        footSensor.setAsBox(2f, 0.1f, new Vector2(0, -1.5f), 0);
+        fixtureDef = new FixtureDef();
+        fixtureDef.shape = footSensor;
+        fixtureDef.isSensor = true;
+        fixtureDef.density = .0000001f;
+        fixtureDef.filter.categoryBits = (short) Constants.FOOT_BITS;
+        fixtureDef.filter.maskBits = -1;
+        playerBody.createFixture(fixtureDef).setUserData(this);
+
+    }
+
+    private void createBody2(World world)
     {
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -208,15 +259,7 @@ public class Player
 
         //playerBox.dispose();
 
-/*        //sensor
-        playerBox.setAsBox(0.5f, 0.1f, new Vector2(0, -1.5f), 0);
-        fixtureDef.isSensor = true;
-        Fixture footSensorFixture = playerBody.createFixture(fixtureDef);
-        footSensorFixture.setUserData("foot");*/
-
     }
-
-
 
 
     private void createAnimations()

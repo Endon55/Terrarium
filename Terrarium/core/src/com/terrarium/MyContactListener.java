@@ -19,13 +19,28 @@ public class MyContactListener implements ContactListener
         System.out.println("contact");
         Body a = contact.getFixtureA().getBody();
         Body b = contact.getFixtureB().getBody();
+
+        Fixture aFix = contact.getFixtureA();
+        Fixture bFix = contact.getFixtureB();
+
         System.out.println(a.getUserData());
         System.out.println(b.getUserData());
-        if((a.getUserData() == "Player" && b.getUserData() == "GroundTile") || (a.getUserData() == "GroundTile" && b.getUserData() == "Player"))
+
+
+        if(aFix.getFilterData().categoryBits == bFix.getFilterData().maskBits || bFix.getFilterData().categoryBits == aFix.getFilterData().maskBits)
         {
             player.setState(SpriteState.State.GROUNDED);
             System.out.println("landed");
         }
+
+
+
+        //to fix
+        /*        if((a.getUserData() == "Player" && b.getUserData() == "GroundTile") || (a.getUserData() == "GroundTile" && b.getUserData() == "Player"))
+        {
+            player.setState(SpriteState.State.GROUNDED);
+            System.out.println("landed");
+        }*/
 
 /*        System.out.println("contact");
         Body a = contact.getFixtureA().getBody();

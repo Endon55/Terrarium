@@ -38,15 +38,27 @@ public class Constants
     public static float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_GRAVITY_SCALE = 3f;
 
-
-
-
-
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final float BACKGROUND_SCROLLING_RATIO = 2f;
 
-
     public static final float TILE_DIRT_FRICTION = 1f;
+
+
+
+
+
+
+
+    public static final short LEVEL_BITS = 0x0001;
+    public static final short PLAYER_BITS = 0x0002;
+    public static final short FOOT_BITS = 0x0004;
+
+
+
+
+
+
+
 
 
 }
