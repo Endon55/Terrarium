@@ -25,31 +25,33 @@ public class Player
 
     float frameTiming = 0.065f;
 
-    Body playerBody;
-    BodyDef playerBodyDef;
-    Texture goldTexture;
+    private Body playerBody;
+    private BodyDef playerBodyDef;
 
+    private Texture spriteSheet;
+    private TextureRegion[] walkLeft;
+    private TextureRegion[] walkRight;
+    private Animation<TextureRegion> leftAnimation;
+    private Animation<TextureRegion> rightAnimation;
+    private TextureRegion jumpLeft;
+    private TextureRegion jumpRight;
 
-    Texture spriteSheet;
-    TextureRegion[] walkLeft;
-    TextureRegion[] walkRight;
-    Animation<TextureRegion> leftAnimation;
-    Animation<TextureRegion> rightAnimation;
-    TextureRegion jumpLeft;
-    TextureRegion jumpRight;
+    private TextureRegion stillLeft;
+    private TextureRegion stillRight;
 
-    TextureRegion stillLeft;
-    TextureRegion stillRight;
+    private boolean moving;
+    private boolean hitWall;
+    private boolean canJump;
 
-    boolean moving;
-
-    float oldVelocity;
+    private float oldVelocity;
 
 
     public Player(World world)
     {
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
+        hitWall = false;
+        canJump = true;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
         oldVelocity = 1;
@@ -60,156 +62,101 @@ public class Player
     public void update(SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
+        System.out.println(canJump);
 
-
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && state != SpriteState.State.AIRBORNE)
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && canJump)
         {
-            jump(batch);
+            jump();
         }
-        else if (Gdx.input.isKeyPressed(Input.Keys.A))
+        //Left Walking
+        if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
-            leftWalk(batch, deltaTime);
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D))
-        {
-            rightWalk(batch, deltaTime);
-        }
-        else if(state == SpriteState.State.AIRBORNE)
-        {
-            if(direction == SpriteState.Direction.LEFT)
+            if(direction != SpriteState.Direction.LEFT_WALL)
             {
-                draw(batch, jumpLeft);
-            }
-            else if(direction == SpriteState.Direction.RIGHT)
-            {
-                draw(batch, jumpRight);
-            }
-        }
-        else
-        {
-            moving = false;
-            if(direction == SpriteState.Direction.LEFT)
-            {
+                moving = true;
                 direction = SpriteState.Direction.LEFT;
-                draw(batch, stillLeft);
+                move();
+                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+            else if(state == SpriteState.State.AIRBORNE)
+            {
+
+                draw(batch, jumpLeft);
             }
             else
             {
+                draw(batch, stillLeft);
+                moving = false;
+            }
+
+        }
+        //Right walking
+        else if (Gdx.input.isKeyPressed(Input.Keys.D))
+        {
+            if(direction != SpriteState.Direction.RIGHT_WALL)
+            {
+                moving = true;
                 direction = SpriteState.Direction.RIGHT;
+
+                move();
+                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+            else if(state == SpriteState.State.AIRBORNE)
+            {
+
+                draw(batch, jumpRight);
+            }
+            else
+            {
                 draw(batch, stillRight);
+                moving = false;
             }
         }
-
-
-        camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
-        camera.update();
-
-    }
-
-    public void leftWalk(Batch batch, float deltaTime)
-    {
-        moving = true;
-        move();
-        if(state != SpriteState.State.AIRBORNE)
-        {
-            state = SpriteState.State.GROUNDED;
-        }
-        setDirection(SpriteState.Direction.LEFT);
-        if(state != SpriteState.State.AIRBORNE)
-        {
-            state = SpriteState.State.GROUNDED;
-        }
-        if(state == SpriteState.State.AIRBORNE)
-        {
-            draw(batch, jumpLeft);
-        }
-        else
-        {
-            TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-            draw(batch, currentFrame);
-        }
-    }
-    public void rightWalk(Batch batch, float deltaTime)
-    {
-        moving = true;
-        move();
-        if(state != SpriteState.State.AIRBORNE)
-        {
-            state = SpriteState.State.GROUNDED;
-        }
-        setDirection(SpriteState.Direction.RIGHT);
-        if(state == SpriteState.State.AIRBORNE)
-        {
-            draw(batch, jumpRight);
-        }
-        else
-        {
-            TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-            draw(batch, currentFrame);
-        }
-    }
-
-
-    private void draw(Batch batch, TextureRegion textureRegion)
-    {
-        batch.draw(textureRegion,
-                //Width
-                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.x) - Constants.PLAYER_TILE / 2,
-                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
-    }
-
-    private void move()
-    {
-        //!(playerBody.getLinearVelocity().x == 0 && state == SpriteState.State.AIRBORNE)
-        float currentVelocity = playerBody.getLinearVelocity().x;
-        if(!(currentVelocity == 0 && oldVelocity == 0 && state == SpriteState.State.AIRBORNE))
-        {
-
-            if(direction == SpriteState.Direction.RIGHT && moving && playerBody.getLinearVelocity().x < Constants.PLAYER_MAX_MOVEMENT_SPEED)
-            {
-                playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-                oldVelocity = currentVelocity;
-            }
-            else if(direction == SpriteState.Direction.LEFT && moving && playerBody.getLinearVelocity().x > Constants.PLAYER_MAX_MOVEMENT_SPEED * -1)
-            {
-                playerBody.applyLinearImpulse(new Vector2(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE.x * -1, 0), playerBody.getWorldCenter(), true);
-                oldVelocity = currentVelocity;
-            }
-        }
-    }
-
-    public void jump(Batch batch)
-    {
-        state = SpriteState.State.AIRBORNE;
-        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-
-        if(direction == SpriteState.Direction.LEFT)
+        else if (direction == SpriteState.Direction.LEFT)
         {
             draw(batch, stillLeft);
+            moving = false;
         }
         else
         {
             draw(batch, stillRight);
+            moving = false;
         }
 
+        camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
+        camera.update();
+    }
 
+    private void move()
+    {
+        float currentVelocity = playerBody.getLinearVelocity().x;
+        if(direction == SpriteState.Direction.LEFT && currentVelocity > Constants.PLAYER_MAX_VELOCITY * -1)
+        {
+            playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE_LEFT, playerBody.getWorldCenter(), true);
+        }
+        else if(direction == SpriteState.Direction.RIGHT && currentVelocity < Constants.PLAYER_MAX_VELOCITY)
+        {
+            playerBody.applyLinearImpulse(Constants.PLAYER_MOVEMENT_LINEAR_IMPULSE_RIGHT, playerBody.getWorldCenter(), true);
+        }
+    }
+
+    public void jump()
+    {
+        playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
+        canJump = false;
     }
 
     private void createBody(World world)
     {
-
-
-
-
         //this block fixes everything
-
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
         playerBodyDef.fixedRotation = true;
         playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
         playerBody = world.createBody(playerBodyDef);
         playerBody.setUserData("Player");
-
 
         PolygonShape baseBox = new PolygonShape();
         baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
@@ -218,56 +165,57 @@ public class Player
         fixtureDef.density = Constants.PLAYER_DENSITY;
         fixtureDef.friction = Constants.PLAYER_FRICTION;
         fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
-        fixtureDef.filter.categoryBits = (short) Constants.PLAYER_BITS;
-
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_PLAYER;
+        fixtureDef.filter.maskBits = Constants.MASK_PLAYER;
         playerBody.createFixture(fixtureDef);
+        baseBox.dispose();
 
-
-        //playerBox.dispose();
-
-        //sensor
+        //Foot Sensor
         PolygonShape footSensor = new PolygonShape();
-        footSensor.setAsBox(2f, 0.1f, new Vector2(0, -1.5f), 0);
+        //width, height, x position, y position
+        footSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 2), Constants.PLAYER_SENSOR_THICKNESS, new Vector2(0, DrawingUtils.pixelsToMeters(-Constants.PLAYER_HEIGHT / 2)), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = footSensor;
         fixtureDef.isSensor = true;
         fixtureDef.density = .0000001f;
-        fixtureDef.filter.categoryBits = (short) Constants.FOOT_BITS;
-        fixtureDef.filter.maskBits = -1;
-        playerBody.createFixture(fixtureDef).setUserData(this);
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_FOOT;
+        fixtureDef.filter.maskBits = Constants.MASK_SENSORS;
+        playerBody.createFixture(fixtureDef).setUserData("foot");
+        footSensor.dispose();
+
+        //Left Sensor
+        PolygonShape leftSensor = new PolygonShape();
+        //width, height, x position, y position
+        leftSensor.setAsBox(Constants.PLAYER_SENSOR_THICKNESS, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(-Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
+        fixtureDef = new FixtureDef();
+        fixtureDef.shape = leftSensor;
+        fixtureDef.isSensor = true;
+        fixtureDef.density = .0000001f;
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_LEFT;
+        fixtureDef.filter.maskBits = Constants.MASK_SENSORS;
+        playerBody.createFixture(fixtureDef).setUserData("left");
+
+        //Right Sensor
+        PolygonShape rightSensor = new PolygonShape();
+        //width, height, x position, y position
+        rightSensor.setAsBox(Constants.PLAYER_SENSOR_THICKNESS, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 + 1), 0), 0);
+        fixtureDef = new FixtureDef();
+        fixtureDef.shape = rightSensor;
+        fixtureDef.isSensor = true;
+        fixtureDef.density = .0000001f;
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_RIGHT;
+        fixtureDef.filter.maskBits = Constants.MASK_SENSORS;
+        playerBody.createFixture(fixtureDef).setUserData("right");
+        rightSensor.dispose();
+
+
+
 
     }
-
-    private void createBody2(World world)
-    {
-        playerBodyDef = new BodyDef();
-        playerBodyDef.type = BodyDef.BodyType.DynamicBody;
-        playerBodyDef.fixedRotation = true;
-        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
-        playerBody = world.createBody(playerBodyDef);
-        playerBody.setUserData("Player");
-
-
-        PolygonShape baseBox = new PolygonShape();
-        baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = baseBox;
-        fixtureDef.density = Constants.PLAYER_DENSITY;
-        fixtureDef.friction = Constants.PLAYER_FRICTION;
-        fixtureDef.restitution = Constants.PLAYER_RESTITUTION;
-        playerBody.createFixture(fixtureDef);
-
-        //playerBox.dispose();
-
-    }
-
 
     private void createAnimations()
     {
         spriteSheet = AssetLoader.textureLoader("core/assets/goldArmor.png");
-
-        goldTexture = AssetLoader.textureLoader("core/assets/goldStill.png");
-
 
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet,
                 spriteSheet.getWidth() / FRAME_COLS,
@@ -288,7 +236,13 @@ public class Player
         rightAnimation = new Animation<TextureRegion>(frameTiming, walkRight);
 
     }
-
+    private void draw(Batch batch, TextureRegion textureRegion)
+    {
+        batch.draw(textureRegion,
+                //Width
+                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.x) - Constants.PLAYER_TILE / 2,
+                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
+    }
     public float getMoveSpeed()
     {
         return playerBody.getLinearVelocity().x;
@@ -318,7 +272,24 @@ public class Player
         this.state = state;
     }
     public boolean getMoving()
+{
+    return moving;
+}
+    public void setMoving(boolean moving)
     {
-        return moving;
+        this.moving = moving;
     }
+    public boolean getHitWall()
+    {
+        return hitWall;
+    }
+    public void setHitWall(boolean hitWall)
+    {
+        this.hitWall = hitWall;
+    }
+    public void setCanJump(boolean canJump)
+    {
+        this.canJump = canJump;
+    }
+
 }

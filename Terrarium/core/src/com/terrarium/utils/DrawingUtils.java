@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.*;
 public class DrawingUtils
 {
 
+    //Tile square with cut corners
     public static PolygonShape squareShearShape()
     {
         int shear = Constants.TILE_SHEAR;
@@ -83,39 +84,6 @@ public class DrawingUtils
         return tileBody;
     }
 
-
-    public static Body createVertexSquareBody(World world, Vector2 position)
-    {
-
-
-        Body tileBody;
-        BodyDef tileBodyDef;
-        tileBodyDef = new BodyDef();
-        tileBodyDef.type = BodyDef.BodyType.StaticBody;
-        tileBodyDef.fixedRotation = true;
-        tileBodyDef.position.set(position.x + .5f, position.y + .5f);
-
-        tileBody = world.createBody(tileBodyDef);
-        tileBody.setUserData("GroundTile");
-        Vector2[] vertices = new Vector2[4];
-        vertices[0] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(-10));
-        vertices[1] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(10));
-        vertices[2] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(10));
-        vertices[3] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(-10));
-        //vertices[4] = new Vector2(DrawingUtils.pixelsToMeters(-5), DrawingUtils.pixelsToMeters(-5));
-
-        ChainShape tileBox = new ChainShape();
-        tileBox.createChain(vertices);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = tileBox;
-        fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
-        fixtureDef.filter.categoryBits = (short) Constants.LEVEL_BITS;
-        fixtureDef.filter.maskBits = Constants.PLAYER_BITS;
-        tileBody.createFixture(fixtureDef);
-
-        return tileBody;
-    }
 
     public static PolygonShape pointSidedSquare()
     {

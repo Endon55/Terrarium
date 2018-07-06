@@ -28,10 +28,12 @@ public class Constants
     public static final float PLAYER_WIDTH = 25f; //34
     public static final float PLAYER_HEIGHT = 55f;
     public static final float PLAYER_TILE = 64f;
+    public static final float PLAYER_SENSOR_THICKNESS = 0.05f;
     public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);
 
-    public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE = new Vector2(1f, 0);
-    public static final float PLAYER_MAX_MOVEMENT_SPEED = 8f;
+    public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_LEFT = new Vector2(-1f, 0);
+    public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_RIGHT = new Vector2(1f, 0);
+    public static final float PLAYER_MAX_VELOCITY = 8f;
 
     public static float PLAYER_DENSITY = 0.5f;
     public static float PLAYER_FRICTION = .9f;
@@ -49,9 +51,15 @@ public class Constants
 
 
 
-    public static final short LEVEL_BITS = 0x0001;
-    public static final short PLAYER_BITS = 0x0002;
-    public static final short FOOT_BITS = 0x0004;
+    public static final short CATEGORY_LEVEL = 0x0001;
+    public static final short CATEGORY_PLAYER = 0x0002;
+    public static final short CATEGORY_FOOT = 0x0004;
+    public static final short CATEGORY_LEFT = 0x0008;
+    public static final short CATEGORY_RIGHT = 0x00016;
+
+    public static final short MASK_PLAYER = CATEGORY_LEVEL;
+    public static final short MASK_SENSORS = CATEGORY_LEVEL;
+    public static final short MASK_LEVEL = CATEGORY_PLAYER | CATEGORY_FOOT | CATEGORY_LEFT | CATEGORY_RIGHT;
 
 
 

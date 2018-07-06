@@ -5,7 +5,9 @@ public class SpriteState
     public enum Direction
     {
         LEFT,
-        RIGHT
+        RIGHT,
+        LEFT_WALL,
+        RIGHT_WALL
     }
     public enum State
     {
