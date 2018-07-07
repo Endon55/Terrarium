@@ -80,8 +80,9 @@ public class MapBuilder
         fixtureDef.shape = tileBox;
         fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
         fixtureDef.filter.categoryBits = Constants.CATEGORY_LEVEL;
-        fixtureDef.filter.maskBits = Constants.MASK_LEVEL;
-        tileBody.createFixture(fixtureDef);
+        //fixtureDef.filter.maskBits = Constants.MASK_LEVEL;
+
+        tileBody.createFixture(fixtureDef).setUserData("level");
 
         return tileBody;
     }

@@ -9,6 +9,7 @@ public class MyContactListener implements ContactListener
 
     Player player;
 
+
     public MyContactListener(Player player)
     {
         this.player = player;
@@ -17,59 +18,34 @@ public class MyContactListener implements ContactListener
     @Override
     public void beginContact(Contact contact)
     {
-        System.out.println("contact");
-        Body a = contact.getFixtureA().getBody();
-        Body b = contact.getFixtureB().getBody();
 
         Fixture aFix = contact.getFixtureA();
         Fixture bFix = contact.getFixtureB();
-
-        System.out.println(aFix.getUserData());
-        System.out.println(bFix.getUserData());
-
-
-/*        if(aFix.getFilterData().categoryBits == bFix.getFilterData().maskBits || bFix.getFilterData().categoryBits == aFix.getFilterData().maskBits)
-        {
-            player.setState(SpriteState.State.GROUNDED);
-            System.out.println("landed");
-        }*/
-
+        //Foot Sensor
         if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT || bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
             player.setState(SpriteState.State.GROUNDED);
             player.setCanJump(true);
-            System.out.println("foot");
         }
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT || bFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT)
+        //Left Sensor
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT )
         {
-            player.setDirection(SpriteState.Direction.LEFT_WALL);
-            System.out.println("left");
+            player.addLeftCollision(aFix.getUserData().toString());
         }
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT || bFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT)
         {
-            player.setDirection(SpriteState.Direction.RIGHT_WALL);
-            System.out.println("right");
+            player.addLeftCollision(bFix.getUserData().toString());
+        }
+        //Right Sensor
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        {
+            player.addRightCollision(aFix.getUserData().toString());
+        }
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        {
+            player.addRightCollision(bFix.getUserData().toString());
         }
 
-
-
-
-
-        //to fix
-        /*        if((a.getUserData() == "Player" && b.getUserData() == "GroundTile") || (a.getUserData() == "GroundTile" && b.getUserData() == "Player"))
-        {
-            player.setState(SpriteState.State.GROUNDED);
-            System.out.println("landed");
-        }*/
-
-/*        System.out.println("contact");
-        Body a = contact.getFixtureA().getBody();
-        Body b = contact.getFixtureB().getBody();
-        if((a.getUserData() == "foot" || b.getUserData() == "foot"))
-        {
-            player.setState(SpriteState.State.GROUNDED);
-            System.out.println("landed");
-        }*/
     }
 
     @Override
@@ -77,30 +53,35 @@ public class MyContactListener implements ContactListener
     {
         Fixture aFix = contact.getFixtureA();
         Fixture bFix = contact.getFixtureB();
-
+        //Foot Sensor
         if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT || bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
             player.setState(SpriteState.State.AIRBORNE);
-            System.out.println("airborne");
         }
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT || bFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT)
+        //Left Sensor
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT)
         {
-            player.setDirection(SpriteState.Direction.LEFT);
-            System.out.println("left");
+            player.removeLeftCollision(aFix.getUserData().toString());
         }
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT || bFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT)
         {
-            player.setDirection(SpriteState.Direction.RIGHT);
-            System.out.println("right");
+            player.removeLeftCollision(bFix.getUserData().toString());
+        }
+        //Right Sensor
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        {
+            player.removeRightCollision(aFix.getUserData().toString());
+        }
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_RIGHT)
+        {
+            player.removeRightCollision(bFix.getUserData().toString());
         }
     }
-
     @Override
     public void preSolve(Contact contact, Manifold oldManifold)
     {
 
     }
-
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse)
     {

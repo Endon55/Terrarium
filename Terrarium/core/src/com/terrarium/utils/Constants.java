@@ -28,7 +28,7 @@ public class Constants
     public static final float PLAYER_WIDTH = 25f; //34
     public static final float PLAYER_HEIGHT = 55f;
     public static final float PLAYER_TILE = 64f;
-    public static final float PLAYER_SENSOR_THICKNESS = 0.05f;
+    public static final float PLAYER_SENSOR_THICKNESS = 4f;
     public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);
 
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_LEFT = new Vector2(-1f, 0);

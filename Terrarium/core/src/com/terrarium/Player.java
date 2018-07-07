@@ -11,10 +11,16 @@ import com.terrarium.assets.AssetLoader;
 import com.terrarium.enums.SpriteState;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.DrawingUtils;
+import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
+
+import java.util.ArrayList;
 
 
 public class Player
 {
+
+    ArrayList<String> rightSensorCollisions;
+    ArrayList<String> leftSensorCollisions;
 
     private SpriteState.Direction direction;
     private SpriteState.State state;
@@ -40,17 +46,20 @@ public class Player
     private TextureRegion stillRight;
 
     private boolean moving;
-    private boolean hitWall;
+    private boolean rightSensorHit;
+    private boolean leftSensorHit;
     private boolean canJump;
-
     private float oldVelocity;
 
 
     public Player(World world)
     {
+        rightSensorCollisions = new ArrayList<String>();
+        leftSensorCollisions = new ArrayList<String>();
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
-        hitWall = false;
+        rightSensorHit = false;
+        leftSensorHit = false;
         canJump = true;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
@@ -62,7 +71,6 @@ public class Player
     public void update(SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
-        System.out.println(canJump);
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && canJump)
         {
@@ -71,17 +79,24 @@ public class Player
         //Left Walking
         if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
-            if(direction != SpriteState.Direction.LEFT_WALL)
+
+            direction = SpriteState.Direction.LEFT;
+            if(leftSensorCollisions.size() == 0)
             {
-                moving = true;
-                direction = SpriteState.Direction.LEFT;
                 move();
-                TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
+                moving = true;
+                if(state == SpriteState.State.AIRBORNE)
+                {
+                    draw(batch, jumpLeft);
+                }
+                else
+                {
+                    TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
+                    draw(batch, currentFrame);
+                }
             }
             else if(state == SpriteState.State.AIRBORNE)
             {
-
                 draw(batch, jumpLeft);
             }
             else
@@ -94,14 +109,20 @@ public class Player
         //Right walking
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
         {
-            if(direction != SpriteState.Direction.RIGHT_WALL)
+            direction = SpriteState.Direction.RIGHT;
+            if(rightSensorCollisions.size() == 0)
             {
                 moving = true;
-                direction = SpriteState.Direction.RIGHT;
-
                 move();
-                TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
+                if(state == SpriteState.State.AIRBORNE)
+                {
+                    draw(batch, jumpRight);
+                }
+                else
+                {
+                    TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
+                    draw(batch, currentFrame);
+                }
             }
             else if(state == SpriteState.State.AIRBORNE)
             {
@@ -114,6 +135,7 @@ public class Player
                 moving = false;
             }
         }
+        //Drawing stationary sprite
         else if (direction == SpriteState.Direction.LEFT)
         {
             draw(batch, stillLeft);
@@ -173,7 +195,7 @@ public class Player
         //Foot Sensor
         PolygonShape footSensor = new PolygonShape();
         //width, height, x position, y position
-        footSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 2), Constants.PLAYER_SENSOR_THICKNESS, new Vector2(0, DrawingUtils.pixelsToMeters(-Constants.PLAYER_HEIGHT / 2)), 0);
+        footSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 2), DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), new Vector2(0, DrawingUtils.pixelsToMeters(-Constants.PLAYER_HEIGHT / 2)), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = footSensor;
         fixtureDef.isSensor = true;
@@ -186,7 +208,7 @@ public class Player
         //Left Sensor
         PolygonShape leftSensor = new PolygonShape();
         //width, height, x position, y position
-        leftSensor.setAsBox(Constants.PLAYER_SENSOR_THICKNESS, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(-Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
+        leftSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(-Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = leftSensor;
         fixtureDef.isSensor = true;
@@ -198,7 +220,7 @@ public class Player
         //Right Sensor
         PolygonShape rightSensor = new PolygonShape();
         //width, height, x position, y position
-        rightSensor.setAsBox(Constants.PLAYER_SENSOR_THICKNESS, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 + 1), 0), 0);
+        rightSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = rightSensor;
         fixtureDef.isSensor = true;
@@ -272,24 +294,41 @@ public class Player
         this.state = state;
     }
     public boolean getMoving()
-{
-    return moving;
-}
+    {
+        return moving;
+    }
     public void setMoving(boolean moving)
     {
         this.moving = moving;
     }
-    public boolean getHitWall()
+    public void setRightSensorHit(boolean rightSensorHit)
     {
-        return hitWall;
+        this.rightSensorHit = rightSensorHit;
     }
-    public void setHitWall(boolean hitWall)
+
+    public void setLeftSensorHit(boolean leftSensorHit)
     {
-        this.hitWall = hitWall;
+        this.leftSensorHit = leftSensorHit;
     }
     public void setCanJump(boolean canJump)
     {
         this.canJump = canJump;
     }
 
+    public void addRightCollision(String collision)
+    {
+        rightSensorCollisions.add(collision);
+    }
+    public void removeRightCollision(String collision)
+    {
+        rightSensorCollisions.remove(collision);
+    }
+    public void addLeftCollision(String collision)
+    {
+        leftSensorCollisions.add(collision);
+    }
+    public void removeLeftCollision(String collision)
+    {
+        leftSensorCollisions.remove(collision);
+    }
 }
