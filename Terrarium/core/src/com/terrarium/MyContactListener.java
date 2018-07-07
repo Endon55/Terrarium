@@ -22,9 +22,16 @@ public class MyContactListener implements ContactListener
         Fixture aFix = contact.getFixtureA();
         Fixture bFix = contact.getFixtureB();
         //Foot Sensor
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT || bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
             player.setState(SpriteState.State.GROUNDED);
+            player.addFootCollision(aFix.getUserData().toString());
+            player.setCanJump(true);
+        }
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
+        {
+            player.setState(SpriteState.State.GROUNDED);
+            player.addFootCollision(bFix.getUserData().toString());
             player.setCanJump(true);
         }
         //Left Sensor
@@ -54,8 +61,14 @@ public class MyContactListener implements ContactListener
         Fixture aFix = contact.getFixtureA();
         Fixture bFix = contact.getFixtureB();
         //Foot Sensor
-        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT || bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
+        if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
+            player.removeFootCollision(aFix.getUserData().toString());
+            player.setState(SpriteState.State.AIRBORNE);
+        }
+        if(bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
+        {
+            player.removeFootCollision(bFix.getUserData().toString());
             player.setState(SpriteState.State.AIRBORNE);
         }
         //Left Sensor

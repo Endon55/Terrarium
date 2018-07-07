@@ -11,7 +11,6 @@ import com.terrarium.assets.AssetLoader;
 import com.terrarium.enums.SpriteState;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.DrawingUtils;
-import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 
 import java.util.ArrayList;
 
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 public class Player
 {
 
+    ArrayList<String> footSensorCollisions;
     ArrayList<String> rightSensorCollisions;
     ArrayList<String> leftSensorCollisions;
 
@@ -46,24 +46,22 @@ public class Player
     private TextureRegion stillRight;
 
     private boolean moving;
-    private boolean rightSensorHit;
-    private boolean leftSensorHit;
     private boolean canJump;
-    private float oldVelocity;
+    private int jumpFrames;
 
 
     public Player(World world)
     {
+        jumpFrames = Constants.PLAYER_JUMP_FRAMES;
+
+        footSensorCollisions = new ArrayList<String>();
         rightSensorCollisions = new ArrayList<String>();
         leftSensorCollisions = new ArrayList<String>();
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
-        rightSensorHit = false;
-        leftSensorHit = false;
         canJump = true;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
-        oldVelocity = 1;
         createBody(world);
         createAnimations();
     }
@@ -72,68 +70,24 @@ public class Player
     {
         deltaTime += Gdx.graphics.getDeltaTime();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && canJump)
+        if(jumpFrames > 0)
+        {
+            jumpFrames--;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && jumpFrames == 0 && footSensorCollisions.size() > 0)
         {
             jump();
         }
         //Left Walking
         if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
-
-            direction = SpriteState.Direction.LEFT;
-            if(leftSensorCollisions.size() == 0)
-            {
-                move();
-                moving = true;
-                if(state == SpriteState.State.AIRBORNE)
-                {
-                    draw(batch, jumpLeft);
-                }
-                else
-                {
-                    TextureRegion currentFrame = leftAnimation.getKeyFrame(deltaTime, true);
-                    draw(batch, currentFrame);
-                }
-            }
-            else if(state == SpriteState.State.AIRBORNE)
-            {
-                draw(batch, jumpLeft);
-            }
-            else
-            {
-                draw(batch, stillLeft);
-                moving = false;
-            }
-
+            move(batch, SpriteState.Direction.LEFT, leftAnimation, jumpLeft, stillLeft, leftSensorCollisions.size(), deltaTime);
         }
         //Right walking
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
         {
-            direction = SpriteState.Direction.RIGHT;
-            if(rightSensorCollisions.size() == 0)
-            {
-                moving = true;
-                move();
-                if(state == SpriteState.State.AIRBORNE)
-                {
-                    draw(batch, jumpRight);
-                }
-                else
-                {
-                    TextureRegion currentFrame = rightAnimation.getKeyFrame(deltaTime, true);
-                    draw(batch, currentFrame);
-                }
-            }
-            else if(state == SpriteState.State.AIRBORNE)
-            {
-
-                draw(batch, jumpRight);
-            }
-            else
-            {
-                draw(batch, stillRight);
-                moving = false;
-            }
+            move(batch, SpriteState.Direction.RIGHT, rightAnimation, jumpRight, stillRight, rightSensorCollisions.size(), deltaTime);
         }
         //Drawing stationary sprite
         else if (direction == SpriteState.Direction.LEFT)
@@ -151,7 +105,36 @@ public class Player
         camera.update();
     }
 
-    private void move()
+    private void move(Batch batch, SpriteState.Direction direction, Animation<TextureRegion> animation, TextureRegion jumpSprite, TextureRegion stillSprite, int collisions,  float deltaTime)
+    {
+        this.direction = direction;
+        if(collisions == 0)
+        {
+            horizontalImpulse();
+            moving = true;
+            if(state == SpriteState.State.AIRBORNE)
+            {
+                draw(batch, jumpSprite);
+            }
+            else
+            {
+                TextureRegion currentFrame = animation.getKeyFrame(deltaTime, true);
+                draw(batch, currentFrame);
+            }
+        }
+        else if(state == SpriteState.State.AIRBORNE)
+        {
+            draw(batch, jumpSprite);
+        }
+        else
+        {
+            draw(batch, stillSprite);
+            moving = false;
+        }
+    }
+
+
+    private void horizontalImpulse()
     {
         float currentVelocity = playerBody.getLinearVelocity().x;
         if(direction == SpriteState.Direction.LEFT && currentVelocity > Constants.PLAYER_MAX_VELOCITY * -1)
@@ -166,6 +149,7 @@ public class Player
 
     public void jump()
     {
+        jumpFrames = Constants.PLAYER_JUMP_FRAMES;
         playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
         canJump = false;
     }
@@ -301,15 +285,6 @@ public class Player
     {
         this.moving = moving;
     }
-    public void setRightSensorHit(boolean rightSensorHit)
-    {
-        this.rightSensorHit = rightSensorHit;
-    }
-
-    public void setLeftSensorHit(boolean leftSensorHit)
-    {
-        this.leftSensorHit = leftSensorHit;
-    }
     public void setCanJump(boolean canJump)
     {
         this.canJump = canJump;
@@ -323,6 +298,7 @@ public class Player
     {
         rightSensorCollisions.remove(collision);
     }
+
     public void addLeftCollision(String collision)
     {
         leftSensorCollisions.add(collision);
@@ -330,5 +306,18 @@ public class Player
     public void removeLeftCollision(String collision)
     {
         leftSensorCollisions.remove(collision);
+    }
+
+    public void addFootCollision(String collision)
+    {
+        footSensorCollisions.add(collision);
+    }
+    public void removeFootCollision(String collision)
+    {
+        footSensorCollisions.remove(collision);
+    }
+    public int getJumpFrames()
+    {
+        return jumpFrames;
     }
 }
