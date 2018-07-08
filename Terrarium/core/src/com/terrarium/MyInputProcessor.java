@@ -4,11 +4,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.terrarium.enums.SpriteState;
 
-public class UserInputProcessor implements InputProcessor
+public class MyInputProcessor implements InputProcessor
 {
 
     Player player;
-    UserInputProcessor(Player player)
+    MyInputProcessor(Player player)
     {
         this.player = player;
     }

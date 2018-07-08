@@ -1,6 +1,7 @@
 package com.terrarium.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.*;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.sun.javafx.geom.Edge;
 import com.sun.tools.internal.jxc.ap.Const;
 import com.terrarium.Player;
+import com.terrarium.assets.AssetLoader;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.DrawingUtils;
 
@@ -24,22 +26,27 @@ public class MapBuilder
     TiledMap map;
     OrthogonalTiledMapRenderer mapRenderer;
     Body[][] tileBodies;
+    World world;
+    TiledMapTile genericTile;
+    private TextureRegion[] mapSpriteSheet;
+    private TiledMapTileLayer layer;
 
     public MapBuilder(World world)
     {
+        mapSpriteSheet = AssetLoader.textureSheetLoader("core/assets/Ground/sheet.png", 3, 1);
+        this.world = world;
         tileBodies = new Body[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
         mapPath = "core/assets/Ground/Map.tmx";
         map = new TmxMapLoader().load(mapPath);
         mapRenderer = new OrthogonalTiledMapRenderer(map, 1/20f);
-
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
+        layer = (TiledMapTileLayer) map.getLayers().get(0);
         drawTiles(world);
     }
 
     public void drawTiles(World world)
     {
-        TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(0);
         for (int i = 0; i < Constants.MAP_WIDTH; i++)
         {
             for (int j = 0; j < Constants.MAP_HEIGHT; j++)
@@ -98,7 +105,26 @@ public class MapBuilder
         map.dispose();
     }
 
+    public void destroyBlock(int x, int y)
+    {
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] != null)
+        {
+            layer.getCell(x, y).setTile(null);
+            world.destroyBody(tileBodies[x][y]);
+            tileBodies[x][y] = null;
+        }
+    }
+    public void addBlock(int x, int y)
+    {
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] == null)
+        {
+            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+            TiledMapTileSet tileset = map.getTileSets().getTileSet(0);
+            cell.setTile(tileset.getTile(1));
+            layer.setCell(x, y, cell);
+            tileBodies[x][y] = createVertexSquareBody(world, new Vector2(x, y));
+        }
 
-
+    }
 }
 

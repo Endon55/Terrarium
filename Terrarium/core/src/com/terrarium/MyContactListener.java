@@ -26,13 +26,11 @@ public class MyContactListener implements ContactListener
         {
             player.setState(SpriteState.State.GROUNDED);
             player.addFootCollision(aFix.getUserData().toString());
-            player.setCanJump(true);
         }
         if(bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
             player.setState(SpriteState.State.GROUNDED);
             player.addFootCollision(bFix.getUserData().toString());
-            player.setCanJump(true);
         }
         //Left Sensor
         if(aFix.getFilterData().categoryBits == Constants.CATEGORY_LEFT )

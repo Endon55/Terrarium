@@ -46,12 +46,12 @@ public class Player
     private TextureRegion stillRight;
 
     private boolean moving;
-    private boolean canJump;
     private int jumpFrames;
 
 
     public Player(World world)
     {
+
         jumpFrames = Constants.PLAYER_JUMP_FRAMES;
 
         footSensorCollisions = new ArrayList<String>();
@@ -59,7 +59,6 @@ public class Player
         leftSensorCollisions = new ArrayList<String>();
         camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
-        canJump = true;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
         createBody(world);
@@ -151,7 +150,6 @@ public class Player
     {
         jumpFrames = Constants.PLAYER_JUMP_FRAMES;
         playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
-        canJump = false;
     }
 
     private void createBody(World world)
@@ -284,10 +282,6 @@ public class Player
     public void setMoving(boolean moving)
     {
         this.moving = moving;
-    }
-    public void setCanJump(boolean canJump)
-    {
-        this.canJump = canJump;
     }
 
     public void addRightCollision(String collision)
