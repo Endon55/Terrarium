@@ -42,7 +42,7 @@ public class Constants
     public static float PLAYER_FRICTION = .9f;
     public static float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_GRAVITY_SCALE = 3f;
-    public static final float PLAYER_BLOCK_PLACEMENT_RANGE = 3f;
+    public static final float PLAYER_BLOCK_PLACEMENT_RANGE = 4f;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final float BACKGROUND_SCROLLING_RATIO = 2f;

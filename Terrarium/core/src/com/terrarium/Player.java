@@ -327,13 +327,12 @@ public class Player
     }
     public boolean inPlayerBounds(int x, int y)
     {
-        if((abs(playerBody.getPosition().x - x) < Constants.PLAYER_BLOCK_PLACEMENT_RANGE) && (abs(playerBody.getPosition().y - y) < Constants.PLAYER_BLOCK_PLACEMENT_RANGE))
+        Vector2 ply = playerBody.getPosition();
+
+        if (x < ply.x + Constants.PLAYER_BLOCK_PLACEMENT_RANGE - 1 && x > ply.x - Constants.PLAYER_BLOCK_PLACEMENT_RANGE && y < ply.y + Constants.PLAYER_BLOCK_PLACEMENT_RANGE && y > ply.y - Constants.PLAYER_BLOCK_PLACEMENT_RANGE - 1)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        else return false;
     }
 }
