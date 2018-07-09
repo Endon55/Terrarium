@@ -69,7 +69,7 @@ public class GameStage extends Stage
 
             //System.out.println(clickPosition);
             System.out.println("left");
-            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y);
+            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
 
         }
         else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
@@ -77,7 +77,7 @@ public class GameStage extends Stage
             System.out.println("right");
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y);
+            mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
 
         }
         stateTime += Gdx.graphics.getDeltaTime();

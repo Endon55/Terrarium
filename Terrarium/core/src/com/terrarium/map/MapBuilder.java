@@ -105,22 +105,22 @@ public class MapBuilder
         map.dispose();
     }
 
-    public void destroyBlock(int x, int y)
+    public void destroyBlock(int x, int y, boolean nearPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] != null)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] != null && nearPlayer)
         {
             layer.getCell(x, y).setTile(null);
             world.destroyBody(tileBodies[x][y]);
             tileBodies[x][y] = null;
         }
     }
-    public void addBlock(int x, int y)
+    public void addBlock(int x, int y, boolean nearPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] == null)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] == null && nearPlayer)
         {
             TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
             TiledMapTileSet tileset = map.getTileSets().getTileSet(0);
-            cell.setTile(tileset.getTile(1));
+            cell.setTile(tileset.getTile(1)); //1 for dirt, 2 for grassy dirt, 3 for blue sky
             layer.setCell(x, y, cell);
             tileBodies[x][y] = createVertexSquareBody(world, new Vector2(x, y));
         }

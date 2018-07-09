@@ -1,14 +1,10 @@
 
 
 Resizable client
-Destroy object code
 
 Scrolling background link to player speed
 
 Clean up tile physics body generation. Currently uses 4 vertices and could probably reduce that significantly if one big body was generated instead of 100 small ones.
 
-Collision box beneath players, that will be the box that sets the state of the player, it should avoid hitting and sticking to walls
 
-Clicking a tile destroys it
-Clicking a blank tile adds one
-
+Clean up range based destroying using circle fixture around player

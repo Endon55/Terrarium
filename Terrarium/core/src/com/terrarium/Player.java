@@ -14,6 +14,8 @@ import com.terrarium.utils.DrawingUtils;
 
 import java.util.ArrayList;
 
+import static java.lang.Math.abs;
+
 
 public class Player
 {
@@ -68,6 +70,15 @@ public class Player
     public void update(SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
+
+        if(footSensorCollisions.size() > 0)
+        {
+            state = SpriteState.State.GROUNDED;
+        }
+        else
+        {
+            state = SpriteState.State.AIRBORNE;
+        }
 
         if(jumpFrames > 0)
         {
@@ -163,7 +174,7 @@ public class Player
         playerBody.setUserData("Player");
 
         PolygonShape baseBox = new PolygonShape();
-        baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH) / 2, DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT) / 2);
+        baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_WIDTH), DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_HEIGHT));
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = baseBox;
         fixtureDef.density = Constants.PLAYER_DENSITY;
@@ -177,7 +188,7 @@ public class Player
         //Foot Sensor
         PolygonShape footSensor = new PolygonShape();
         //width, height, x position, y position
-        footSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 2), DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), new Vector2(0, DrawingUtils.pixelsToMeters(-Constants.PLAYER_HEIGHT / 2)), 0);
+        footSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_WIDTH - 1), DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), new Vector2(0, DrawingUtils.pixelsToMeters(-Constants.PLAYER_HITBOX_HEIGHT)), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = footSensor;
         fixtureDef.isSensor = true;
@@ -190,7 +201,7 @@ public class Player
         //Left Sensor
         PolygonShape leftSensor = new PolygonShape();
         //width, height, x position, y position
-        leftSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(-Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
+        leftSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_HEIGHT - 1), new Vector2(DrawingUtils.pixelsToMeters(-Constants.PLAYER_HITBOX_WIDTH), 0), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = leftSensor;
         fixtureDef.isSensor = true;
@@ -202,7 +213,7 @@ public class Player
         //Right Sensor
         PolygonShape rightSensor = new PolygonShape();
         //width, height, x position, y position
-        rightSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2 - 2), new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2 - 1), 0), 0);
+        rightSensor.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_SENSOR_THICKNESS), DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_HEIGHT - 1), new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_WIDTH), 0), 0);
         fixtureDef = new FixtureDef();
         fixtureDef.shape = rightSensor;
         fixtureDef.isSensor = true;
@@ -313,5 +324,16 @@ public class Player
     public int getJumpFrames()
     {
         return jumpFrames;
+    }
+    public boolean inPlayerBounds(int x, int y)
+    {
+        if((abs(playerBody.getPosition().x - x) < Constants.PLAYER_BLOCK_PLACEMENT_RANGE) && (abs(playerBody.getPosition().y - y) < Constants.PLAYER_BLOCK_PLACEMENT_RANGE))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

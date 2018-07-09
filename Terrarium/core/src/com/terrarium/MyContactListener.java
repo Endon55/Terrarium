@@ -24,12 +24,10 @@ public class MyContactListener implements ContactListener
         //Foot Sensor
         if(aFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
-            player.setState(SpriteState.State.GROUNDED);
             player.addFootCollision(aFix.getUserData().toString());
         }
         if(bFix.getFilterData().categoryBits == Constants.CATEGORY_FOOT)
         {
-            player.setState(SpriteState.State.GROUNDED);
             player.addFootCollision(bFix.getUserData().toString());
         }
         //Left Sensor
