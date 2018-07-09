@@ -63,22 +63,15 @@ public class GameStage extends Stage
     {
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT))
         {
-
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-
-            //System.out.println(clickPosition);
-            System.out.println("left");
             mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
-
         }
         else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
         {
-            System.out.println("right");
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
             mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
-
         }
         stateTime += Gdx.graphics.getDeltaTime();
         world.step(1 / 60f, 6, 2);

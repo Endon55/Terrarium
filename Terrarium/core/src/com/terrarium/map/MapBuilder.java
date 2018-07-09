@@ -27,21 +27,23 @@ public class MapBuilder
     OrthogonalTiledMapRenderer mapRenderer;
     Body[][] tileBodies;
     World world;
-    TiledMapTile genericTile;
-    private TextureRegion[] mapSpriteSheet;
     private TiledMapTileLayer layer;
+    int mapWidth;
+    int mapHeight;
+
 
     public MapBuilder(World world)
     {
-        mapSpriteSheet = AssetLoader.textureSheetLoader("core/assets/Ground/sheet.png", 3, 1);
         this.world = world;
         tileBodies = new Body[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
-        mapPath = "core/assets/Ground/Map.tmx";
+        mapPath = "core/assets/Ground/MapLarge.tmx";
         map = new TmxMapLoader().load(mapPath);
         mapRenderer = new OrthogonalTiledMapRenderer(map, 1/20f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
+
         layer = (TiledMapTileLayer) map.getLayers().get(0);
+
         drawTiles(world);
     }
 

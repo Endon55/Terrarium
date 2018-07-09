@@ -6,5 +6,4 @@ Scrolling background link to player speed
 
 Clean up tile physics body generation. Currently uses 4 vertices and could probably reduce that significantly if one big body was generated instead of 100 small ones.
 
-
-Clean up range based destroying using circle fixture around player
+Dont let blocks be placed on top of you

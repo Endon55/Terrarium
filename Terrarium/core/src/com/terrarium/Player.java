@@ -169,12 +169,13 @@ public class Player
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
         playerBodyDef.fixedRotation = true;
-        playerBodyDef.position.set(Constants.PLAYER_SCREEN_CENTER);
+        playerBodyDef.position.set(Constants.PLAYER_WORLD_STARTING_POSITION);
         playerBody = world.createBody(playerBodyDef);
         playerBody.setUserData("Player");
 
         PolygonShape baseBox = new PolygonShape();
         baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_WIDTH), DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_HEIGHT));
+        //, new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_SCREEN_CENTER.x), DrawingUtils.pixelsToMeters(Constants.PLAYER_SCREEN_CENTER.y)), 0
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = baseBox;
         fixtureDef.density = Constants.PLAYER_DENSITY;

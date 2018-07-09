@@ -9,8 +9,8 @@ public class Constants
     public static final int TILE_SIZE = 20;
     public static final int TILE_SHEAR = 7;
     public static final int PIXELS_PER_METER = 20;
-    public static final int MAP_WIDTH = 30;
-    public static final int MAP_HEIGHT = 15;
+    public static final int MAP_WIDTH = 150;
+    public static final int MAP_HEIGHT = 50;
 
     //public static final int APP_WIDTH  = 1920; // 1920
     //public static final int APP_HEIGHT = 1080; // 1080
@@ -24,24 +24,32 @@ public class Constants
 
     //Player Constants
     public static final Vector2 PLAYER_SCREEN_CENTER = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(10, 30);
-    public static final float PLAYER_WIDTH = 25f; //34
+    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(75, 25);
+
+    //Player Body and Sprite
+    public static final float PLAYER_WIDTH = 25f; //
     public static final float PLAYER_HEIGHT = 55f;
     public static final float PLAYER_HITBOX_WIDTH = PLAYER_WIDTH / 2;
     public static final float PLAYER_HITBOX_HEIGHT = PLAYER_HEIGHT / 2;
     public static final float PLAYER_TILE = 64f;
-    public static final int PLAYER_JUMP_FRAMES = 60;
     public static final float PLAYER_SENSOR_THICKNESS = 1.5f;
-    public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 15f);
 
+
+    //Player Movement
+    public static final float PLAYER_MAX_VELOCITY = 30f;
+    public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 20f);
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_LEFT = new Vector2(-1f, 0);
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_RIGHT = new Vector2(1f, 0);
-    public static final float PLAYER_MAX_VELOCITY = 8f;
 
+
+    //Player Physics
     public static float PLAYER_DENSITY = 0.5f;
     public static float PLAYER_FRICTION = .9f;
     public static float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_GRAVITY_SCALE = 3f;
+
+    //Player Utility
+    public static final int PLAYER_JUMP_FRAMES = 60;
     public static final float PLAYER_BLOCK_PLACEMENT_RANGE = 4f;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
