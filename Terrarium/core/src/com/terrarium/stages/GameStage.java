@@ -23,6 +23,7 @@ public class GameStage extends Stage
 
     World world;
     SpriteBatch batch;
+    SpriteBatch backgroundBatch;
     Player player;
     MapBuilder mapBuilder;
     MyContactListener listener;
@@ -51,6 +52,7 @@ public class GameStage extends Stage
         mapBuilder = new MapBuilder(world);
         batch = new SpriteBatch();
 
+        backgroundBatch = new SpriteBatch();
         listener = new MyContactListener(player);
         world.setContactListener(listener);
 
@@ -61,27 +63,32 @@ public class GameStage extends Stage
     @Override
     public void draw()
     {
+        stateTime += Gdx.graphics.getDeltaTime();
+        world.step(1 / 60f, 6, 2);
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT))
         {
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
+            //mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
         else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
         {
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
+            //mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, Constants.DIRT_TILE_ID, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
-        stateTime += Gdx.graphics.getDeltaTime();
-        world.step(1 / 60f, 6, 2);
+        //mapBuilder.drawTilesAroundPlayer(world, player.getBody().getPosition());
+
+        backgroundBatch.begin();
+        scrollingBackground.updateAndRender(backgroundBatch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving(), player.getMoveSpeed());
+        backgroundBatch.end();
+
+        mapBuilder.render(camera);
         batch.begin();
-        scrollingBackground.updateAndRender(batch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving(), player.getMoveSpeed());
         player.update(batch, stateTime);
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
         camera.update();
         batch.end();
-        mapBuilder.render(camera);
         debugRenderer.render(world, camera.combined);
 
     }

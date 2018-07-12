@@ -23,13 +23,12 @@ public class DrawingUtils
         vertices[7] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(-shear));
 
 
-
-
         PolygonShape shape = new PolygonShape();
         shape.set(vertices);
         return shape;
 
     }
+
     public static Body createTileBody(World world, Vector2 position)
     {
         Body tileBody;
@@ -99,7 +98,6 @@ public class DrawingUtils
         vertices[5] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(-10));
 
 
-
         PolygonShape shape = new PolygonShape();
         shape.set(vertices);
         return shape;
@@ -120,4 +118,38 @@ public class DrawingUtils
         return meters * Constants.PIXELS_PER_METER;
     }
 
+
+    public static Body createVertexSquareBody(World world, Vector2 position)
+    {
+
+
+        Body tileBody;
+        BodyDef tileBodyDef;
+        tileBodyDef = new BodyDef();
+        tileBodyDef.type = BodyDef.BodyType.StaticBody;
+        tileBodyDef.fixedRotation = true;
+        tileBodyDef.position.set(position.x + .5f, position.y + .5f);
+
+        tileBody = world.createBody(tileBodyDef);
+        tileBody.setUserData("GroundTile");
+        Vector2[] vertices = new Vector2[4];
+        vertices[0] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(-10));
+        vertices[1] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(10));
+        vertices[2] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(10));
+        vertices[3] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(-10));
+        //vertices[4] = new Vector2(DrawingUtils.pixelsToMeters(-5), DrawingUtils.pixelsToMeters(-5));
+
+        ChainShape tileBox = new ChainShape();
+        tileBox.createChain(vertices);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = tileBox;
+        fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_LEVEL;
+        //fixtureDef.filter.maskBits = Constants.MASK_LEVEL;
+
+        tileBody.createFixture(fixtureDef).setUserData("level");
+
+        return tileBody;
+    }
 }

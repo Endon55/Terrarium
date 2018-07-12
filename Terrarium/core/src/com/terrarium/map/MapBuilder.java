@@ -15,9 +15,13 @@ import com.terrarium.Player;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.DrawingUtils;
+import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
+import org.omg.CORBA.CODESET_INCOMPATIBLE;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.ceil;
 
 public class MapBuilder
 {
@@ -25,76 +29,65 @@ public class MapBuilder
     String mapPath;
     TiledMap map;
     OrthogonalTiledMapRenderer mapRenderer;
-    Body[][] tileBodies;
+    Chunk[][] chunks;
+    Vector2[] loadedChunks;
     World world;
     private TiledMapTileLayer layer;
-    int mapWidth;
-    int mapHeight;
+    TiledMapTileSet tileset;
+    int chunkHeight;
+    int chunkWidth;
 
 
     public MapBuilder(World world)
     {
         this.world = world;
-        tileBodies = new Body[Constants.MAP_WIDTH][Constants.MAP_HEIGHT];
-        mapPath = "core/assets/Ground/MapLarge.tmx";
+        mapPath = "core/assets/Ground/MapWithTrees.tmx";
         map = new TmxMapLoader().load(mapPath);
         mapRenderer = new OrthogonalTiledMapRenderer(map, 1/20f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
-
+        tileset = map.getTileSets().getTileSet(0);
         layer = (TiledMapTileLayer) map.getLayers().get(0);
 
-        drawTiles(world);
+        chunkWidth  = (int)ceil(Constants.MAP_WIDTH / Constants.MAP_CHUNK_SIZE);
+        chunkHeight = (int)ceil(Constants.MAP_HEIGHT / Constants.MAP_CHUNK_SIZE);
+
+        chunks = new Chunk[chunkWidth][chunkHeight];
+
+        drawChunks(world);
     }
 
-    public void drawTiles(World world)
+    public void drawChunks(World world)
     {
-        for (int i = 0; i < Constants.MAP_WIDTH; i++)
+        int width = Constants.MAP_WIDTH % Constants.MAP_CHUNK_SIZE;
+        int height = Constants.MAP_HEIGHT % Constants.MAP_CHUNK_SIZE;
+        for (int x = 0; x < chunkWidth; x++)
         {
-            for (int j = 0; j < Constants.MAP_HEIGHT; j++)
+            for (int y = 0; y < chunkHeight; y++)
             {
-                if (layer.getCell(i, j) != null)
-                {
-                    tileBodies[i][j] = createVertexSquareBody(world, new Vector2(i, j));
-                }
+                chunks[x][y] = new Chunk(world, map, new Vector2(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE), Constants.MAP_CHUNK_SIZE, Constants.MAP_CHUNK_SIZE);
 
             }
         }
     }
-    //Ground Tile Square
-    public static Body createVertexSquareBody(World world, Vector2 position)
+
+    public void drawNearbyChunks(World world, Vector2 playerLocation)
     {
+        for (int x = (int)playerLocation.x - Constants.MAP_CHUNK_SIZE / 2; x < (int)playerLocation.x + Constants.MAP_CHUNK_SIZE / 2; x++)
+        {
+            for (int y = (int)playerLocation.y - Constants.MAP_CHUNK_SIZE / 2; y < (int)playerLocation.y + Constants.MAP_CHUNK_SIZE / 2; y++)
+            {
+                if (layer.getCell(x, y) != null)
+                {
+                    chunks[x][y] = new Chunk(world, map, new Vector2(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE), Constants.MAP_CHUNK_SIZE, Constants.MAP_CHUNK_SIZE);
 
+                }
+            }
+        }
 
-        Body tileBody;
-        BodyDef tileBodyDef;
-        tileBodyDef = new BodyDef();
-        tileBodyDef.type = BodyDef.BodyType.StaticBody;
-        tileBodyDef.fixedRotation = true;
-        tileBodyDef.position.set(position.x + .5f, position.y + .5f);
-
-        tileBody = world.createBody(tileBodyDef);
-        tileBody.setUserData("GroundTile");
-        Vector2[] vertices = new Vector2[4];
-        vertices[0] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(-10));
-        vertices[1] = new Vector2(DrawingUtils.pixelsToMeters(-10), DrawingUtils.pixelsToMeters(10));
-        vertices[2] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(10));
-        vertices[3] = new Vector2(DrawingUtils.pixelsToMeters(10), DrawingUtils.pixelsToMeters(-10));
-        //vertices[4] = new Vector2(DrawingUtils.pixelsToMeters(-5), DrawingUtils.pixelsToMeters(-5));
-
-        ChainShape tileBox = new ChainShape();
-        tileBox.createChain(vertices);
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = tileBox;
-        fixtureDef.friction = Constants.TILE_DIRT_FRICTION;
-        fixtureDef.filter.categoryBits = Constants.CATEGORY_LEVEL;
-        //fixtureDef.filter.maskBits = Constants.MASK_LEVEL;
-
-        tileBody.createFixture(fixtureDef).setUserData("level");
-
-        return tileBody;
     }
+
+    //Ground Tile Square
 
     public void render(OrthographicCamera camera)
     {
@@ -107,26 +100,29 @@ public class MapBuilder
         map.dispose();
     }
 
-    public void destroyBlock(int x, int y, boolean nearPlayer)
+/*    public void destroyBlock(int x, int y, boolean nearPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] != null && nearPlayer)
+
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tiles[x][y] != null && nearPlayer)
         {
+            System.out.println(layer.getCell((int) x, (int) y).getTile().getId());
             layer.getCell(x, y).setTile(null);
-            world.destroyBody(tileBodies[x][y]);
-            tileBodies[x][y] = null;
-        }
-    }
-    public void addBlock(int x, int y, boolean nearPlayer)
-    {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tileBodies[x][y] == null && nearPlayer)
-        {
-            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-            TiledMapTileSet tileset = map.getTileSets().getTileSet(0);
-            cell.setTile(tileset.getTile(1)); //1 for dirt, 2 for grassy dirt, 3 for blue sky
-            layer.setCell(x, y, cell);
-            tileBodies[x][y] = createVertexSquareBody(world, new Vector2(x, y));
+            tiles[x][y].removeTile(world);
+            tiles[x][y] = null;
         }
 
     }
+    public void addBlock(int x, int y, int tilesetID, boolean nearPlayer)
+    {
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tiles[x][y] == null && nearPlayer)
+        {
+            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+            TiledMapTileSet tileset = map.getTileSets().getTileSet(tilesetID);
+            cell.setTile(tileset.getTile(1)); //1 for dirt, 2 for grassy dirt, 3 for blue sky
+            layer.setCell(x, y, cell);
+            tiles[x][y] = new Tile(world, new Vector2(x, y), layer, tileset);
+        }
+
+    }*/
 }
 

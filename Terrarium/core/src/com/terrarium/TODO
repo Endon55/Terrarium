@@ -7,3 +7,5 @@ Scrolling background link to player speed
 Clean up tile physics body generation. Currently uses 4 vertices and could probably reduce that significantly if one big body was generated instead of 100 small ones.
 
 Dont let blocks be placed on top of you
+
+Clamp player to world bounds

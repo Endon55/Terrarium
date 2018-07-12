@@ -2,6 +2,7 @@ package com.terrarium.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.sun.prism.image.ViewPort;
 
 public class Constants
 {
@@ -9,8 +10,8 @@ public class Constants
     public static final int TILE_SIZE = 20;
     public static final int TILE_SHEAR = 7;
     public static final int PIXELS_PER_METER = 20;
-    public static final int MAP_WIDTH = 150;
-    public static final int MAP_HEIGHT = 50;
+    public static final int MAP_WIDTH = 260;
+    public static final int MAP_HEIGHT = 100;
 
     //public static final int APP_WIDTH  = 1920; // 1920
     //public static final int APP_HEIGHT = 1080; // 1080
@@ -24,7 +25,7 @@ public class Constants
 
     //Player Constants
     public static final Vector2 PLAYER_SCREEN_CENTER = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(75, 25);
+    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(75, 50);
 
     //Player Body and Sprite
     public static final float PLAYER_WIDTH = 25f; //
@@ -36,7 +37,7 @@ public class Constants
 
 
     //Player Movement
-    public static final float PLAYER_MAX_VELOCITY = 30f;
+    public static final float PLAYER_MAX_VELOCITY = 10;
     public static final Vector2 PLAYER_JUMPING_LINEAR_IMPULSE = new Vector2(0, 20f);
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_LEFT = new Vector2(-1f, 0);
     public static final Vector2 PLAYER_MOVEMENT_LINEAR_IMPULSE_RIGHT = new Vector2(1f, 0);
@@ -48,9 +49,16 @@ public class Constants
     public static float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_GRAVITY_SCALE = 3f;
 
+    //The how many tile bodies will be drawn at any given time.
+    //public static final int MAP_TILE_BODIES_WIDTH = VIEWPORT_WIDTH / 2;
+    public static final int MAP_CHUNK_SIZE = 20;
+    public static final int CHUNKS_TO_LOAD_WIDTH = 5;
+    public static final int CHUNKS_TO_LOAD_HEIGHT = 5;
+
     //Player Utility
     public static final int PLAYER_JUMP_FRAMES = 60;
     public static final float PLAYER_BLOCK_PLACEMENT_RANGE = 4f;
+    public static final int HITS_TO_DESTROY_BLOCK = 3;
 
     public static final Vector2 WORLD_GRAVITY = new Vector2(0, -10);
     public static final float BACKGROUND_SCROLLING_RATIO = 2f;
@@ -75,7 +83,8 @@ public class Constants
 
 
 
-
+    public static final int DIRT_TILE_ID = 0;
+    public static final int GRASS_TILE_ID = 1;
 
 
 
