@@ -51,9 +51,9 @@ public class Constants
 
     //The how many tile bodies will be drawn at any given time.
     //public static final int MAP_TILE_BODIES_WIDTH = VIEWPORT_WIDTH / 2;
-    public static final int MAP_CHUNK_SIZE = 20;
-    public static final int CHUNKS_TO_LOAD_WIDTH = 5;
-    public static final int CHUNKS_TO_LOAD_HEIGHT = 5;
+    public static final int MAP_CHUNK_SIZE = 10;
+    public static final int CHUNKS_TO_LOAD_WIDTH = 2;
+    public static final int CHUNKS_TO_LOAD_HEIGHT = 2;
 
     //Player Utility
     public static final int PLAYER_JUMP_FRAMES = 60;

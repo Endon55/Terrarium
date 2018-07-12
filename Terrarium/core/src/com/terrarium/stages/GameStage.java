@@ -77,7 +77,7 @@ public class GameStage extends Stage
             camera.unproject(clickPosition);
             //mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, Constants.DIRT_TILE_ID, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
-        //mapBuilder.drawTilesAroundPlayer(world, player.getBody().getPosition());
+        mapBuilder.drawNearbyChunks(world, player.getBody().getPosition());
 
         backgroundBatch.begin();
         scrollingBackground.updateAndRender(backgroundBatch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving(), player.getMoveSpeed());

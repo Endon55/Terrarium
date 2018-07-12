@@ -54,7 +54,7 @@ public class MapBuilder
 
         chunks = new Chunk[chunkWidth][chunkHeight];
 
-        drawChunks(world);
+        //drawChunks(world);
     }
 
     public void drawChunks(World world)
@@ -73,18 +73,24 @@ public class MapBuilder
 
     public void drawNearbyChunks(World world, Vector2 playerLocation)
     {
-        for (int x = (int)playerLocation.x - Constants.MAP_CHUNK_SIZE / 2; x < (int)playerLocation.x + Constants.MAP_CHUNK_SIZE / 2; x++)
-        {
-            for (int y = (int)playerLocation.y - Constants.MAP_CHUNK_SIZE / 2; y < (int)playerLocation.y + Constants.MAP_CHUNK_SIZE / 2; y++)
-            {
-                if (layer.getCell(x, y) != null)
-                {
-                    chunks[x][y] = new Chunk(world, map, new Vector2(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE), Constants.MAP_CHUNK_SIZE, Constants.MAP_CHUNK_SIZE);
+        int playerChunkX = (int)playerLocation.x / Constants.MAP_CHUNK_SIZE;
+        int playerChunkY = (int)playerLocation.y / Constants.MAP_CHUNK_SIZE;
 
+        System.out.println("px: " + playerChunkX + " py: " + playerChunkY);
+
+        for (int x = playerChunkX - Constants.CHUNKS_TO_LOAD_WIDTH; x < playerChunkX + Constants.CHUNKS_TO_LOAD_WIDTH; x++)
+        {
+            for (int y = playerChunkY - Constants.CHUNKS_TO_LOAD_HEIGHT; y < playerChunkY + Constants.CHUNKS_TO_LOAD_HEIGHT; y++)
+            {
+                if (x >= 0 && x < chunkWidth && y >=0 && y < chunkHeight)
+                {
+                    if(chunks[x][y] == null)
+                    {
+                        chunks[x][y] = new Chunk(world, map, new Vector2(x * Constants.MAP_CHUNK_SIZE, y * Constants.MAP_CHUNK_SIZE), Constants.MAP_CHUNK_SIZE, Constants.MAP_CHUNK_SIZE);
+                    }
                 }
             }
         }
-
     }
 
     //Ground Tile Square
