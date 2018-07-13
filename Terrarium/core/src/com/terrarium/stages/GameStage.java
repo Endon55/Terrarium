@@ -13,6 +13,7 @@ import com.terrarium.Player;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.map.MapBuilder;
 import com.terrarium.utils.Constants;
+import com.terrarium.utils.Pair;
 import com.terrarium.utils.WorldUtils;
 import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 
@@ -49,7 +50,7 @@ public class GameStage extends Stage
 
         world = WorldUtils.createWorld();
         player = new Player(world);
-        mapBuilder = new MapBuilder(world);
+        mapBuilder = new MapBuilder(world, new Pair((int)player.getBody().getPosition().x / Constants.MAP_CHUNK_SIZE, (int)player.getBody().getPosition().y / Constants.MAP_CHUNK_SIZE));
         batch = new SpriteBatch();
 
         backgroundBatch = new SpriteBatch();
@@ -77,7 +78,8 @@ public class GameStage extends Stage
             camera.unproject(clickPosition);
             //mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, Constants.DIRT_TILE_ID, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
-        mapBuilder.drawNearbyChunks(world, player.getBody().getPosition());
+        /////////////////
+        mapBuilder.updateChunks(world, player.getBody().getPosition());
 
         backgroundBatch.begin();
         scrollingBackground.updateAndRender(backgroundBatch, Gdx.graphics.getDeltaTime(), player.getDirection(), player.getMoving(), player.getMoveSpeed());

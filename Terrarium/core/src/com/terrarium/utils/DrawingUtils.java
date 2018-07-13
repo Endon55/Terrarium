@@ -152,4 +152,25 @@ public class DrawingUtils
 
         return tileBody;
     }
+
+    public static int chunksToTiles(int x)
+    {
+        return x * Constants.MAP_CHUNK_SIZE;
+    }
+
+    public static int tilesToChunks(int x)
+    {
+        return x / Constants.MAP_CHUNK_SIZE;
+    }
+
+    public static int chunksToTiles(float x)
+    {
+        return (int)x * Constants.MAP_CHUNK_SIZE;
+    }
+
+    public static int tilesToChunks(float x)
+    {
+        return (int)x / Constants.MAP_CHUNK_SIZE;
+    }
+
 }
