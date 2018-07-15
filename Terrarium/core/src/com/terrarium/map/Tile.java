@@ -24,10 +24,14 @@ public class Tile
     {
         this.tileset = tileset;
         this.position = position;
-        tileID = layer.getCell((int)position.x, (int)position.y).getTile().getId();
         this.layer = layer;
-        tileBody = DrawingUtils.createVertexSquareBody(world, new Vector2(position.x, position.y));
         hits = Constants.HITS_TO_DESTROY_BLOCK;
+
+        if(layer.getCell((int)position.x, (int)position.y).getTile() != null)
+        {
+            tileID = layer.getCell((int)position.x, (int)position.y).getTile().getId();
+            tileBody = DrawingUtils.createVertexSquareBody(world, new Vector2(position.x, position.y));
+        }
     }
 
     public int tileState()
@@ -37,6 +41,7 @@ public class Tile
 
     public void removeTile(World world)
     {
+
         world.destroyBody(tileBody);
     }
 

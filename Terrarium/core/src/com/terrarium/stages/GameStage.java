@@ -70,13 +70,13 @@ public class GameStage extends Stage
         {
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            //mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
+            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
         else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
         {
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            //mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, Constants.DIRT_TILE_ID, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
+            mapBuilder.addBlock((int)clickPosition.x, (int)clickPosition.y, Constants.DIRT_TILE_ID, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
         /////////////////
         mapBuilder.updateChunks(world, player.getBody().getPosition());

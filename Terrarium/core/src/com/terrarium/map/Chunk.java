@@ -73,4 +73,41 @@ public class Chunk
         return chunkID;
     }
 
+
+    //Coordinates are in tiles, (183, 205)
+    public void destroyBlock(World world, int x, int y)
+    {
+        int xChunk = x % width;
+        int yChunk = y % height;
+
+        System.out.println("x: " + xChunk + " y: " + yChunk);
+        System.out.println("x: " + x + " y: " + y);
+
+        //System.out.println(layer.getCell( x, y).getTile().getId());
+        if(layer.getCell(x, y) != null &&  tiles[xChunk][yChunk] != null)
+        {
+            layer.setCell(x, y, null);
+            tiles[xChunk][yChunk].removeTile(world);
+            tiles[xChunk][yChunk] = null;
+        }
+    }
+
+    //Coordinates are in tiles, (183, 205)
+    public void addBlock(World world, int x, int y, int tilesetID)
+    {
+        int xChunk = x % width;
+        int yChunk = y % height;
+
+        if(layer.getCell(x, y) == null &&  tiles[xChunk][yChunk] == null)
+        {
+            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
+            TiledMapTileSet tileset = map.getTileSets().getTileSet(tilesetID);
+            cell.setTile(tileset.getTile(1)); //1 for dirt, 2 for grassy dirt, 3 for blue sky
+            layer.setCell(x, y, cell);
+            tiles[xChunk][yChunk] = new Tile(world, new Vector2(x, y), layer, tileset);
+        }
+
+    }
+
+
 }

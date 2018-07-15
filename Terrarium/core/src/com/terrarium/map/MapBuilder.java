@@ -59,22 +59,8 @@ public class MapBuilder
         chunkHeight = (int)ceil(Constants.MAP_HEIGHT / Constants.MAP_CHUNK_SIZE);
         chunks = new Chunk[chunkWidth][chunkHeight];
         chunkList = new ArrayList<Pair>();
-        //drawChunks(world);
     }
 
-    public void drawChunks(World world)
-    {
-        int width = Constants.MAP_WIDTH % Constants.MAP_CHUNK_SIZE;
-        int height = Constants.MAP_HEIGHT % Constants.MAP_CHUNK_SIZE;
-        for (int x = 0; x < chunkWidth; x++)
-        {
-            for (int y = 0; y < chunkHeight; y++)
-            {
-                chunks[x][y] = new Chunk(world, map, new Vector2(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE));
-
-            }
-        }
-    }
 
     public void updateChunks(World world, Vector2 playerLocation)
     {
@@ -190,29 +176,21 @@ public class MapBuilder
         map.dispose();
     }
 
-/*    public void destroyBlock(int x, int y, boolean nearPlayer)
+    public void destroyBlock(int x, int y, boolean nearPlayer)
     {
-
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tiles[x][y] != null && nearPlayer)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer)
         {
-            System.out.println(layer.getCell((int) x, (int) y).getTile().getId());
-            layer.getCell(x, y).setTile(null);
-            tiles[x][y].removeTile(world);
-            tiles[x][y] = null;
+            chunks[DrawingUtils.tilesToChunks(x)][DrawingUtils.tilesToChunks(y)].destroyBlock(world, x, y);
+        }
+    }
+
+    public void addBlock(int x, int y, int tilesetID, boolean nearPlayer)
+    {
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer)
+        {
+            chunks[DrawingUtils.tilesToChunks(x)][DrawingUtils.tilesToChunks(y)].addBlock(world, x, y, tilesetID);
         }
 
     }
-    public void addBlock(int x, int y, int tilesetID, boolean nearPlayer)
-    {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && tiles[x][y] == null && nearPlayer)
-        {
-            TiledMapTileLayer.Cell cell = new TiledMapTileLayer.Cell();
-            TiledMapTileSet tileset = map.getTileSets().getTileSet(tilesetID);
-            cell.setTile(tileset.getTile(1)); //1 for dirt, 2 for grassy dirt, 3 for blue sky
-            layer.setCell(x, y, cell);
-            tiles[x][y] = new Tile(world, new Vector2(x, y), layer, tileset);
-        }
-
-    }*/
 }
 
