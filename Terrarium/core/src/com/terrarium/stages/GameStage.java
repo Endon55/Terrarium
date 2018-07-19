@@ -103,8 +103,8 @@ public class GameStage extends Stage
         Vector3 position = new Vector3(playerPosition.x, playerPosition.y, 0.0f);
         System.out.println("pre:  " + playerPosition);
         Vector3 pos = camera.project(position);
-        playerPosition.x = pos.x - Constants.PLAYER_WIDTH / 2;
-        playerPosition.y = pos.y - Constants.PLAYER_HEIGHT / 2;
+        playerPosition.x = pos.x - Constants.PLAYER_WIDTH * 1.325f;
+        playerPosition.y = pos.y - Constants.PLAYER_HEIGHT / 2 - 2;
         System.out.println("post: " + playerPosition);
 
         player.update(playerPosition, batch, stateTime);
