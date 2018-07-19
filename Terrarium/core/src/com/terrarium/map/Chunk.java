@@ -1,13 +1,11 @@
 package com.terrarium.map;
 
-import com.badlogic.gdx.maps.Map;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.terrarium.utils.Constants;
-import com.terrarium.utils.DrawingUtils;
 import com.terrarium.utils.Pair;
 
 import static com.terrarium.utils.DrawingUtils.tilesToChunks;
@@ -80,8 +78,8 @@ public class Chunk
         int xChunk = x % width;
         int yChunk = y % height;
 
-        System.out.println("x: " + xChunk + " y: " + yChunk);
-        System.out.println("x: " + x + " y: " + y);
+        //System.out.println("x: " + xChunk + " y: " + yChunk);
+        //System.out.println("x: " + x + " y: " + y);
 
         //System.out.println(layer.getCell( x, y).getTile().getId());
         if(layer.getCell(x, y) != null &&  tiles[xChunk][yChunk] != null)

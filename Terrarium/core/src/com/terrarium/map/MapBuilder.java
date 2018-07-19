@@ -1,27 +1,15 @@
 package com.terrarium.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.*;
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.sun.javafx.geom.Edge;
-import com.sun.tools.internal.jxc.ap.Const;
-import com.terrarium.Player;
-import com.terrarium.assets.AssetLoader;
 import com.terrarium.utils.Constants;
 import com.terrarium.utils.DrawingUtils;
 import com.terrarium.utils.Pair;
-import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
-import org.omg.CORBA.CODESET_INCOMPATIBLE;
-
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import static java.lang.Math.ceil;
 
@@ -176,17 +164,17 @@ public class MapBuilder
         map.dispose();
     }
 
-    public void destroyBlock(int x, int y, boolean nearPlayer)
+    public void destroyBlock(int x, int y, boolean nearPlayer, boolean overlapsPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer && !overlapsPlayer)
         {
             chunks[DrawingUtils.tilesToChunks(x)][DrawingUtils.tilesToChunks(y)].destroyBlock(world, x, y);
         }
     }
 
-    public void addBlock(int x, int y, int tilesetID, boolean nearPlayer)
+    public void addBlock(int x, int y, int tilesetID, boolean nearPlayer, boolean overlapsPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer && !overlapsPlayer)
         {
             chunks[DrawingUtils.tilesToChunks(x)][DrawingUtils.tilesToChunks(y)].addBlock(world, x, y, tilesetID);
         }

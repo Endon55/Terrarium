@@ -27,18 +27,17 @@ public class Tile
         this.layer = layer;
         hits = Constants.HITS_TO_DESTROY_BLOCK;
 
-        if(layer.getCell((int)position.x, (int)position.y).getTile() != null)
-        {
+        //if(layer.getCell((int)position.x, (int)position.y).getTile() != null)
+        //{
             tileID = layer.getCell((int)position.x, (int)position.y).getTile().getId();
             tileBody = DrawingUtils.createVertexSquareBody(world, new Vector2(position.x, position.y));
-        }
+        //}
     }
 
     public int tileState()
     {
         return tileID;
     }
-
     public void removeTile(World world)
     {
 

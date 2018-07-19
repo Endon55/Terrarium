@@ -15,18 +15,21 @@ public class ScrollingBackground
     float delta_speed;
     float imageScale;
     float textureWidth;
+    int screenWidth;
+    int screenHeight;
 
     public ScrollingBackground(Texture backgroundTexture, float moveSpeed)
     {
         this.backgroundTexture = backgroundTexture;
-        if(backgroundTexture.getWidth() < Constants.APP_WIDTH)
+        screenWidth = Constants.APP_WIDTH;
+        screenHeight = Constants.APP_HEIGHT;
+        if(backgroundTexture.getWidth() < screenWidth)
         {
             textureWidth = backgroundTexture.getWidth();
         }
         else
         {
-
-            textureWidth = Constants.APP_WIDTH;
+            textureWidth = screenWidth;
         }
         x1 = 0;
         x2 = textureWidth;

@@ -14,28 +14,30 @@ import com.terrarium.utils.DrawingUtils;
 
 import java.util.ArrayList;
 
-import static java.lang.Math.abs;
-
-
 public class Player
 {
-
+    //Keeps track of all the collisions that each sensor hits.
     ArrayList<String> footSensorCollisions;
     ArrayList<String> rightSensorCollisions;
     ArrayList<String> leftSensorCollisions;
 
     private SpriteState.Direction direction;
     private SpriteState.State state;
-    private OrthographicCamera camera;
+    //private OrthographicCamera camera;
 
-    private static final int FRAME_COLS = 9;
-    private static final int FRAME_ROWS = 4;
 
     float frameTiming = 0.065f;
 
     private Body playerBody;
     private BodyDef playerBodyDef;
 
+    //Animation SpriteSheet Size
+    private static final int FRAME_COLS = 9;
+    private static final int FRAME_ROWS = 4;
+
+
+    Vector2 screenCenter;
+    //Animations
     private Texture spriteSheet;
     private TextureRegion[] walkLeft;
     private TextureRegion[] walkRight;
@@ -43,7 +45,6 @@ public class Player
     private Animation<TextureRegion> rightAnimation;
     private TextureRegion jumpLeft;
     private TextureRegion jumpRight;
-
     private TextureRegion stillLeft;
     private TextureRegion stillRight;
 
@@ -51,15 +52,15 @@ public class Player
     private int jumpFrames;
 
 
-    public Player(World world)
+    public Player(World world, int windowWidth, int windowHeight)
     {
 
         jumpFrames = Constants.PLAYER_JUMP_FRAMES;
-
+        screenCenter = new Vector2((float) (windowWidth / 2) - Constants.PLAYER_WIDTH / 2, (float) (windowHeight / 2));
         footSensorCollisions = new ArrayList<String>();
         rightSensorCollisions = new ArrayList<String>();
         leftSensorCollisions = new ArrayList<String>();
-        camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
+        //camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
@@ -67,10 +68,11 @@ public class Player
         createAnimations();
     }
 
-    public void update(SpriteBatch batch, float deltaTime)
+    public void update(Vector2 position, SpriteBatch batch, float deltaTime)
     {
         deltaTime += Gdx.graphics.getDeltaTime();
-
+        //screenCenter = playerBody.getPosition();
+        screenCenter = position;
         if(footSensorCollisions.size() > 0)
         {
             state = SpriteState.State.GROUNDED;
@@ -92,30 +94,30 @@ public class Player
         //Left Walking
         if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
-            move(batch, SpriteState.Direction.LEFT, leftAnimation, jumpLeft, stillLeft, leftSensorCollisions.size(), deltaTime);
+            move(screenCenter, batch, SpriteState.Direction.LEFT, leftAnimation, jumpLeft, stillLeft, leftSensorCollisions.size(), deltaTime);
         }
         //Right walking
         else if (Gdx.input.isKeyPressed(Input.Keys.D))
         {
-            move(batch, SpriteState.Direction.RIGHT, rightAnimation, jumpRight, stillRight, rightSensorCollisions.size(), deltaTime);
+            move(screenCenter, batch, SpriteState.Direction.RIGHT, rightAnimation, jumpRight, stillRight, rightSensorCollisions.size(), deltaTime);
         }
         //Drawing stationary sprite
         else if (direction == SpriteState.Direction.LEFT)
         {
-            draw(batch, stillLeft);
+            draw(screenCenter, batch, stillLeft);
             moving = false;
         }
         else
         {
-            draw(batch, stillRight);
+            draw(screenCenter, batch, stillRight);
             moving = false;
         }
 
-        camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
-        camera.update();
+        //camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
+        //camera.update();
     }
 
-    private void move(Batch batch, SpriteState.Direction direction, Animation<TextureRegion> animation, TextureRegion jumpSprite, TextureRegion stillSprite, int collisions,  float deltaTime)
+    private void move(Vector2 position, Batch batch, SpriteState.Direction direction, Animation<TextureRegion> animation, TextureRegion jumpSprite, TextureRegion stillSprite, int collisions,  float deltaTime)
     {
         this.direction = direction;
         if(collisions == 0)
@@ -124,21 +126,21 @@ public class Player
             moving = true;
             if(state == SpriteState.State.AIRBORNE)
             {
-                draw(batch, jumpSprite);
+                draw(position, batch, jumpSprite);
             }
             else
             {
                 TextureRegion currentFrame = animation.getKeyFrame(deltaTime, true);
-                draw(batch, currentFrame);
+                draw(position, batch, currentFrame);
             }
         }
         else if(state == SpriteState.State.AIRBORNE)
         {
-            draw(batch, jumpSprite);
+            draw(position, batch, jumpSprite);
         }
         else
         {
-            draw(batch, stillSprite);
+            draw(position, batch, stillSprite);
             moving = false;
         }
     }
@@ -224,9 +226,6 @@ public class Player
         playerBody.createFixture(fixtureDef).setUserData("right");
         rightSensor.dispose();
 
-
-
-
     }
 
     private void createAnimations()
@@ -252,12 +251,21 @@ public class Player
         rightAnimation = new Animation<TextureRegion>(frameTiming, walkRight);
 
     }
-    private void draw(Batch batch, TextureRegion textureRegion)
+    private void draw(Vector2 position, Batch batch, TextureRegion textureRegion)
     {
+        System.out.println("in:  " + position);
         batch.draw(textureRegion,
                 //Width
-                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.x) - Constants.PLAYER_TILE / 2,
-                DrawingUtils.metersToPixels(Constants.PLAYER_SCREEN_CENTER.y) - Constants.PLAYER_HEIGHT / 2 - 3);
+                position.x,
+                position.y);
+
+/*
+        batch.draw(textureRegion,
+                //Width
+                DrawingUtils.metersToPixels(pos.x) - Constants.PLAYER_WIDTH / 2,
+                DrawingUtils.metersToPixels(pos.y) - Constants.PLAYER_HEIGHT / 2);
+*/
+
     }
     public float getMoveSpeed()
     {
@@ -335,5 +343,29 @@ public class Player
             return true;
         }
         else return false;
+    }
+
+    public boolean overlapsPlayer(float x,float y)
+    {
+        Vector2 pos = playerBody.getPosition();
+        int left   = (int) pos.x;
+        int right  = (int) (pos.x + DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH));
+        //int bottom = (int) pos.y;
+        //int top    = (int) (pos.y + DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT));
+        int bottom = (int) (pos.x - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+        int top    = (int) (pos.y - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+
+        if(x > left && x < right && y > bottom && y < top)
+        {
+            System.out.println("in player");
+            return true;
+        }
+        else return false;
+    }
+
+    public void resize(int width, int height)
+    {
+
+        screenCenter = new Vector2((float) (width / 2) - Constants.PLAYER_WIDTH / 2, (float) (height / 2) - Constants.PLAYER_HEIGHT / 2);
     }
 }
