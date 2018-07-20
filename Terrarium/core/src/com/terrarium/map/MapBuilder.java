@@ -164,9 +164,9 @@ public class MapBuilder
         map.dispose();
     }
 
-    public void destroyBlock(int x, int y, boolean nearPlayer, boolean overlapsPlayer)
+    public void destroyBlock(int x, int y, boolean nearPlayer)
     {
-        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer && !overlapsPlayer)
+        if(x >= 0 && x < Constants.MAP_WIDTH && y >= 0 && y < Constants.MAP_HEIGHT && nearPlayer)
         {
             chunks[DrawingUtils.tilesToChunks(x)][DrawingUtils.tilesToChunks(y)].destroyBlock(world, x, y);
         }

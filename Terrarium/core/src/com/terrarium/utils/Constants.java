@@ -13,12 +13,12 @@ public class Constants
     public static final int MAP_WIDTH = 260;
     public static final int MAP_HEIGHT = 100;
 
-    public static final int APP_WIDTH  = 1920;// 1920
-    public static final int APP_HEIGHT = 1080; // 1080
+    //public static final int APP_WIDTH  = 1920;// 1920
+    //public static final int APP_HEIGHT = 1080; // 1080
     //public static final int APP_WIDTH  = 120;// 1920
     //public static final int APP_HEIGHT = 120; // 1080
-    //public static final int APP_WIDTH  = 900; // 1920
-    //public static final int APP_HEIGHT = 480; // 1080
+    public static final int APP_WIDTH  = 900; // 1920
+    public static final int APP_HEIGHT = 480; // 1080
 
     public static final int VIEWPORT_WIDTH = APP_WIDTH / PIXELS_PER_METER;
     public static final int VIEWPORT_HEIGHT = APP_HEIGHT / PIXELS_PER_METER;

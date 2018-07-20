@@ -77,11 +77,7 @@ public class Chunk
     {
         int xChunk = x % width;
         int yChunk = y % height;
-
-        //System.out.println("x: " + xChunk + " y: " + yChunk);
-        //System.out.println("x: " + x + " y: " + y);
-
-        //System.out.println(layer.getCell( x, y).getTile().getId());
+        
         if(layer.getCell(x, y) != null &&  tiles[xChunk][yChunk] != null)
         {
             layer.setCell(x, y, null);

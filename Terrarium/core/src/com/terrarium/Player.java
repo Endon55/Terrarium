@@ -2,7 +2,6 @@ package com.terrarium;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
@@ -23,7 +22,6 @@ public class Player
 
     private SpriteState.Direction direction;
     private SpriteState.State state;
-    //private OrthographicCamera camera;
 
 
     float frameTiming = 0.065f;
@@ -60,7 +58,6 @@ public class Player
         footSensorCollisions = new ArrayList<String>();
         rightSensorCollisions = new ArrayList<String>();
         leftSensorCollisions = new ArrayList<String>();
-        //camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH, Constants.VIEWPORT_HEIGHT);
         moving = false;
         direction = SpriteState.Direction.LEFT;
         state = SpriteState.State.AIRBORNE;
@@ -70,9 +67,11 @@ public class Player
 
     public void update(Vector2 position, SpriteBatch batch, float deltaTime)
     {
+        //Progresses the animation cycle
         deltaTime += Gdx.graphics.getDeltaTime();
-        //screenCenter = playerBody.getPosition();
         screenCenter = position;
+
+        //Checks collisions to see if on the ground.
         if(footSensorCollisions.size() > 0)
         {
             state = SpriteState.State.GROUNDED;
@@ -81,16 +80,17 @@ public class Player
         {
             state = SpriteState.State.AIRBORNE;
         }
-
+        //Jump frames stay at zero unless player jumps, then are decremented to prevent infinite jumping.
         if(jumpFrames > 0)
         {
             jumpFrames--;
         }
-
+        //Checks if we can jump
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && jumpFrames == 0 && footSensorCollisions.size() > 0)
         {
             jump();
         }
+
         //Left Walking
         if (Gdx.input.isKeyPressed(Input.Keys.A))
         {
@@ -112,13 +112,11 @@ public class Player
             draw(screenCenter, batch, stillRight);
             moving = false;
         }
-
-        //camera.position.set(playerBody.getPosition().x, playerBody.getPosition().y, 0);
-        //camera.update();
     }
 
     private void move(Vector2 position, Batch batch, SpriteState.Direction direction, Animation<TextureRegion> animation, TextureRegion jumpSprite, TextureRegion stillSprite, int collisions,  float deltaTime)
     {
+        //This function decides which animations should be drawn.
         this.direction = direction;
         if(collisions == 0)
         {
@@ -148,6 +146,7 @@ public class Player
 
     private void horizontalImpulse()
     {
+        //Hits player with either a left or right Impulse
         float currentVelocity = playerBody.getLinearVelocity().x;
         if(direction == SpriteState.Direction.LEFT && currentVelocity > Constants.PLAYER_MAX_VELOCITY * -1)
         {
@@ -161,23 +160,23 @@ public class Player
 
     public void jump()
     {
+        //Hits player with an upward Impulse
         jumpFrames = Constants.PLAYER_JUMP_FRAMES;
         playerBody.applyLinearImpulse(Constants.PLAYER_JUMPING_LINEAR_IMPULSE, playerBody.getWorldCenter(), true);
     }
 
     private void createBody(World world)
     {
-        //this block fixes everything
+        //Player Box definition
         playerBodyDef = new BodyDef();
         playerBodyDef.type = BodyDef.BodyType.DynamicBody;
         playerBodyDef.fixedRotation = true;
         playerBodyDef.position.set(Constants.PLAYER_WORLD_STARTING_POSITION);
         playerBody = world.createBody(playerBodyDef);
         playerBody.setUserData("Player");
-
+        //Player Fixture Definition
         PolygonShape baseBox = new PolygonShape();
         baseBox.setAsBox(DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_WIDTH), DrawingUtils.pixelsToMeters(Constants.PLAYER_HITBOX_HEIGHT));
-        //, new Vector2(DrawingUtils.pixelsToMeters(Constants.PLAYER_SCREEN_CENTER.x), DrawingUtils.pixelsToMeters(Constants.PLAYER_SCREEN_CENTER.y)), 0
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = baseBox;
         fixtureDef.density = Constants.PLAYER_DENSITY;
@@ -230,8 +229,8 @@ public class Player
 
     private void createAnimations()
     {
+        //Rips the sprites from the Spritesheet to create all the different animations.
         spriteSheet = AssetLoader.textureLoader("core/assets/goldArmor.png");
-
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet,
                 spriteSheet.getWidth() / FRAME_COLS,
                 spriteSheet.getHeight() / FRAME_ROWS);
@@ -253,19 +252,12 @@ public class Player
     }
     private void draw(Vector2 position, Batch batch, TextureRegion textureRegion)
     {
-        System.out.println("in:  " + position);
+        //Draws the player sprite
+
         batch.draw(textureRegion,
                 //Width
                 position.x,
                 position.y);
-
-/*
-        batch.draw(textureRegion,
-                //Width
-                DrawingUtils.metersToPixels(pos.x) - Constants.PLAYER_WIDTH / 2,
-                DrawingUtils.metersToPixels(pos.y) - Constants.PLAYER_HEIGHT / 2);
-*/
-
     }
     public float getMoveSpeed()
     {
@@ -303,7 +295,6 @@ public class Player
     {
         this.moving = moving;
     }
-
     public void addRightCollision(String collision)
     {
         rightSensorCollisions.add(collision);
@@ -334,6 +325,7 @@ public class Player
     {
         return jumpFrames;
     }
+
     public boolean inPlayerBounds(int x, int y)
     {
         Vector2 ply = playerBody.getPosition();
@@ -348,12 +340,27 @@ public class Player
     public boolean overlapsPlayer(float x,float y)
     {
         Vector2 pos = playerBody.getPosition();
-        int left   = (int) pos.x;
-        int right  = (int) (pos.x + DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH));
-        //int bottom = (int) pos.y;
-        //int top    = (int) (pos.y + DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT));
-        int bottom = (int) (pos.x - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
-        int top    = (int) (pos.y - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+        System.out.println(pos);
+
+
+        if((int) x > pos.x + DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH / 2))
+        {
+            x++;
+        }
+
+
+/*
+        int left   = (int) (pos.x - DrawingUtils.pixelsToMeters(Constants.TILE_SIZE));
+        int right  = (int) (pos.x + DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH + Constants.TILE_SIZE));
+        int top    = (int) (pos.y + DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+        int bottom = (int) (pos.y - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+*/
+
+        int left   = (int) (pos.x - DrawingUtils.pixelsToMeters(Constants.TILE_SIZE));
+        int right  = (int) (pos.x + DrawingUtils.pixelsToMeters(Constants.PLAYER_WIDTH + Constants.TILE_SIZE));
+        int top    = (int) (pos.y + DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT));
+        int bottom = (int) (pos.y - DrawingUtils.pixelsToMeters(Constants.PLAYER_HEIGHT / 2));
+
 
         if(x > left && x < right && y > bottom && y < top)
         {
@@ -365,7 +372,6 @@ public class Player
 
     public void resize(int width, int height)
     {
-
         screenCenter = new Vector2((float) (width / 2) - Constants.PLAYER_WIDTH / 2, (float) (height / 2) - Constants.PLAYER_HEIGHT / 2);
     }
 }

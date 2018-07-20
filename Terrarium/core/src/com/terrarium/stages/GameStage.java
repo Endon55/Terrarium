@@ -14,10 +14,8 @@ import com.terrarium.Player;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.map.MapBuilder;
 import com.terrarium.utils.Constants;
-import com.terrarium.utils.DrawingUtils;
 import com.terrarium.utils.Pair;
 import com.terrarium.utils.WorldUtils;
-import jdk.javadoc.internal.doclets.formats.html.SourceToHTMLConverter;
 
 public class GameStage extends Stage
 {
@@ -48,7 +46,6 @@ public class GameStage extends Stage
         scrollingBackground = new ScrollingBackground(AssetLoader.textureLoader("core/assets/sky.png"), Constants.BACKGROUND_SCROLLING_RATIO);
         stateTime = 0;
 
-
         world = WorldUtils.createWorld();
         player = new Player(world, windowWidth, windowHeight);
         mapBuilder = new MapBuilder(world, new Pair((int)player.getBody().getPosition().x / Constants.MAP_CHUNK_SIZE, (int)player.getBody().getPosition().y / Constants.MAP_CHUNK_SIZE));
@@ -73,7 +70,7 @@ public class GameStage extends Stage
         {
             Vector3 clickPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(clickPosition);
-            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y),player.overlapsPlayer(clickPosition.x, clickPosition.y));
+            mapBuilder.destroyBlock((int)clickPosition.x, (int)clickPosition.y, player.inPlayerBounds((int)clickPosition.x, (int)clickPosition.y));
         }
         else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT))
         {
@@ -94,18 +91,19 @@ public class GameStage extends Stage
         //Draws the map
         mapBuilder.render(camera);
 
-
         batch.begin();
         camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
         camera.update();
+
         //Calculates player sprite position to draw on top of player body
         Vector2 playerPosition = player.getBody().getPosition();
         Vector3 position = new Vector3(playerPosition.x, playerPosition.y, 0.0f);
-        System.out.println("pre:  " + playerPosition);
         Vector3 pos = camera.project(position);
+
+        //Gets the screen coordinates to draw player sprite
+        //For whatever reason that weird constant works.
         playerPosition.x = pos.x - Constants.PLAYER_WIDTH * 1.325f;
         playerPosition.y = pos.y - Constants.PLAYER_HEIGHT / 2 - 2;
-        System.out.println("post: " + playerPosition);
 
         player.update(playerPosition, batch, stateTime);
 
