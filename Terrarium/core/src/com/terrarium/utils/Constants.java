@@ -10,7 +10,7 @@ public class Constants
     public static final int TILE_SIZE = 20;
     public static final int TILE_SHEAR = 7;
     public static final int PIXELS_PER_METER = 20;
-    public static final int MAP_WIDTH = 260;
+    public static final int MAP_WIDTH = 250;
     public static final int MAP_HEIGHT = 100;
 
     //public static final int APP_WIDTH  = 1920;// 1920
@@ -27,7 +27,7 @@ public class Constants
 
     //Player Constants
     public static final Vector2 PLAYER_SCREEN_CENTER = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(75, 50);
+    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(230, 95);
 
     //Player Body and Sprite
     public static final float PLAYER_WIDTH = 25f; //

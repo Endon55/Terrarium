@@ -47,8 +47,38 @@ public class MapBuilder
         chunkHeight = (int)ceil(Constants.MAP_HEIGHT / Constants.MAP_CHUNK_SIZE);
         chunks = new Chunk[chunkWidth][chunkHeight];
         chunkList = new ArrayList<Pair>();
+        drawWorldBoundingBox(world);
     }
 
+    private void drawWorldBoundingBox(World world)
+    {
+        BodyDef boundingDef = new BodyDef();
+        //Player Box definition
+        boundingDef.type = BodyDef.BodyType.StaticBody;
+        boundingDef.fixedRotation = true;
+        boundingDef.position.set(new Vector2(0, 0));
+        Body boundingBody = world.createBody(boundingDef);
+        boundingBody.setUserData("GroundTile");
+        //Player Fixture Definition
+
+        Vector2[] vertices = new Vector2[5];
+        vertices[0] = new Vector2(0, 0);
+        vertices[1] = new Vector2(0, Constants.MAP_HEIGHT);
+        vertices[2] = new Vector2(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+        vertices[3] = new Vector2(Constants.MAP_WIDTH, 0);
+        vertices[4] = new Vector2(0, 0);
+
+        ChainShape baseBox = new ChainShape();
+        baseBox.createChain(vertices);
+
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = baseBox;
+        fixtureDef.friction = 0;
+        fixtureDef.filter.categoryBits = Constants.CATEGORY_LEVEL;
+        boundingBody.createFixture(fixtureDef);
+        baseBox.dispose();
+    }
 
     public void updateChunks(World world, Vector2 playerLocation)
     {

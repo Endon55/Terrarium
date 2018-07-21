@@ -92,7 +92,9 @@ public class GameStage extends Stage
         mapBuilder.render(camera);
 
         batch.begin();
-        camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
+
+        //camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
+        camera.position.set(player.getCameraPosition());
         camera.update();
 
         //Calculates player sprite position to draw on top of player body
@@ -114,7 +116,6 @@ public class GameStage extends Stage
 
         //Draws the physics bodies, Disable for release.
         debugRenderer.render(world, camera.combined);
-
     }
 
     public void resize()

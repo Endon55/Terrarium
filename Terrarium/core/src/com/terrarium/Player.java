@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.terrarium.assets.AssetLoader;
 import com.terrarium.enums.SpriteState;
@@ -374,4 +375,30 @@ public class Player
     {
         screenCenter = new Vector2((float) (width / 2) - Constants.PLAYER_WIDTH / 2, (float) (height / 2) - Constants.PLAYER_HEIGHT / 2);
     }
+
+    public Vector3 getCameraPosition()
+    {
+        Vector2 playerPosition = playerBody.getPosition();
+        Vector3 position = new Vector3(playerPosition.x, playerPosition.y, 0);
+
+        if(playerPosition.x <= (Constants.VIEWPORT_WIDTH + 1) / 2)
+        {
+            position.x = (Constants.VIEWPORT_WIDTH + .02f) / 2;
+        }
+        if(playerPosition.x >= Constants.MAP_WIDTH - (Constants.VIEWPORT_WIDTH -.02f) / 2)
+        {
+            position.x = Constants.MAP_WIDTH - (Constants.VIEWPORT_WIDTH - .02f) / 2;
+        }
+        if(playerPosition.y <= Constants.VIEWPORT_HEIGHT / 2)
+        {
+            position.y = Constants.VIEWPORT_HEIGHT / 2;
+        }
+        if(playerPosition.y >= Constants.MAP_HEIGHT - (Constants.VIEWPORT_HEIGHT) / 2)
+        {
+            position.y = Constants.MAP_HEIGHT - (Constants.VIEWPORT_HEIGHT) / 2;
+        }
+        return position;
+
+    }
+
 }
