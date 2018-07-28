@@ -27,7 +27,7 @@ public class Constants
 
     //Player Constants
     public static final Vector2 PLAYER_SCREEN_CENTER = new Vector2(VIEWPORT_WIDTH / 2, VIEWPORT_HEIGHT / 2);
-    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(230, 95);
+    public static final Vector2 PLAYER_WORLD_STARTING_POSITION = new Vector2(50, 43);
 
     //Player Body and Sprite
     public static final float PLAYER_WIDTH = 25f; //
